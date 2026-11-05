@@ -31,6 +31,9 @@ def download(release, feature, bbox, output):
     source = f's3://overturemaps-us-west-2/release/{release}/theme={TYPES[feature]}/type={feature}/*'
     con = duckdb.connect()
     try:
+        extensions = Path('data/cache/duckdb_extensions').resolve()
+        extensions.mkdir(parents=True, exist_ok=True)
+        con.execute('SET extension_directory = ?', [str(extensions)])
         con.execute('INSTALL httpfs')
         con.execute('LOAD httpfs')
         con.execute("SET s3_region='us-west-2'")
