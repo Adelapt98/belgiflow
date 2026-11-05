@@ -28,7 +28,7 @@ Verified locally on 5 November 2026. No AWS resources were provisioned.
 
 The full graph is visible in the running Dagster UI. Its initial combined run exposed shared-volume permissions on Windows. The local Compose service was corrected and the next full graph run succeeded. That failure is retained in the genuine run history.
 
-Live AWS execution, IAM/database bootstrap, Glue runtime compatibility, private routing, and cloud costs remain unverified. No SDK-stub test is presented as a real AWS service run. GitHub CI is configured but has not run remotely.
+Live AWS execution, IAM/database bootstrap, Glue runtime compatibility, private routing, and cloud costs remain unverified. No SDK-stub test is presented as a real AWS service run. GitHub CI runs the Python regression and Dagster/dbt checks separately from the Spark container check. The first remote Python job passed. The Spark job exposed a missing Python-version setup on the runner, which is now pinned to the project-required Python 3.12. See GitHub Actions for the current run results.
 
 National coverage and performance are not claimed. The map-change teaching scenario is explicitly synthetic unless an actual previous snapshot is supplied. Building accessibility concerns sampled roads, not routing or real travel time.
 

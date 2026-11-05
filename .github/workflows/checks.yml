@@ -26,6 +26,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: pip install -r requirements.lock.txt && pip install -e . --no-deps
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r requirements.lock.txt && python -m pip install -e . --no-deps
       - run: python -m belgiflow.platform.cli run --pipeline 02_daily_shipment_ingestion --source-mode fixtures --shipments 100
       - run: docker run --rm -v "$PWD/jobs:/jobs:ro" -v "$PWD/data:/data" apache/spark:3.5.3 /opt/spark/bin/spark-submit --master 'local[2]' /jobs/glue_compact.py --INPUT_PATH /data/platform/partitions/2026-01-03/accepted_events.parquet --OUTPUT_PATH /tmp/compacted --EXPECTED_SHIPMENTS 100
