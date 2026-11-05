@@ -7,7 +7,8 @@ models:
       - name: status
         tests:
           - accepted_values:
-              values: [created, dispatched, delivered, cancelled]
+              arguments:
+                values: [created, dispatched, delivered, cancelled]
   - name: fct_shipments
     columns:
       - name: shipment_id
