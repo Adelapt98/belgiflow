@@ -1,28 +1,33 @@
 # Verification record
 
-Verified locally on 5 November 2026. Results describe the executed workloads, not production guarantees.
+Verified locally on 5 November 2026. No AWS resources were provisioned.
 
 | Check | Result |
 | --- | --- |
-| Python tests including PostgreSQL CDC | 23 passed, including source-contract and simulated S3 failure checks |
-| dbt | Three table models built, nine data tests passed |
-| Dagster | Operational ingestion, dbt build, and dashboard asset completed successfully |
-| PostgreSQL ordering | Later change ID committed first, earlier transaction still consumed after commit |
-| PostgreSQL interruption | Local journal commit followed by simulated pre-ack failure replayed without duplicate changes |
-| PostgreSQL to service history | 100 synthetic shipments evaluated through CDC-backed depot history |
-| Spark generated workload | 100,000 synthetic shipments, 300,000 events, Spark 3.5.3 local two-worker execution |
-| Spark pipeline integration | Read the pipeline's Parquet batch, reconciled 1,000 shipments and 3,000 events, persisted output |
-| Overture release | 2026-10-21.0 |
-| Live Brussels sample | 58 buildings, 24 transportation segments, 15 connectors |
-| Belgian polygon | Retrieved national land boundary, bounding coordinates approximately 2.5455, 49.4970, 6.4081, 51.5051 |
-| Source filtering | Live sample geometries clipped against the national polygon |
-| Terraform | Initialized and validated locally, no AWS resources created |
-| Docker | Locked-runtime image built, synthetic demo executed successfully, packaged SQL resource verified |
+| Full regression suite | 35 passed, including isolated PostgreSQL integration and offline AWS contracts |
+| Dagster definitions | Fourteen distinct named jobs, twenty assets, plus the full graph |
+| Full UI graph | SUCCESS, run `c1ad0619-0df0-43d7-a4e0-2c26569ba0bb` |
+| Full-graph cohort | 300 synthetic shipments and 900 accepted events for 2026-01-03 |
+| Data quality | Coverage, capacity, SLA, event identities, and policy history reconciled |
+| New dbt project | Five models and ten data tests run against the local build and serving targets |
+| Incremental corrections | Higher event revision rebuilt one affected shipment, replay preserved counts |
+| Multiple partitions | A second cohort retained the first cohort's shipment facts |
+| Failed dbt check | Pending changed shipment IDs remained available for retry |
+| PostgreSQL CDC | Commit-order inversion, deletes, interruption, and replay verified in a disposable database |
+| Spark integration | Dagster dispatched the shared worker and executed the compaction script successfully |
+| Earlier Spark workload | 100,000 synthetic shipments and 300,000 events executed in the separate scaling reference job |
+| Public geography | Actual Belgian boundary, 58 buildings, 24 road segments, 15 connectors from Overture release 2026-10-21.0 |
+| Lake and serving | Immutable local delivery and six replicated serving tables verified |
+| S3 publication | Offline success-pointer and failure contracts verified |
+| Geographic cloud bundle | Pinned checksum-verified S3-style roundtrip tested offline with source provenance retained |
+| Redshift Data API | Real SDK request shape validated offline with Stubber |
+| Glue dispatch and catalog | Real SDK request shapes validated offline with Stubber |
+| Redshift dbt adapter | Adapter installed and project parsed successfully without a warehouse connection |
+| Terraform | Optional Glue, Redshift, network, storage, and IAM configuration validated locally |
+| Application image | Expanded image built with locked runtime dependencies |
 
-The first broad source scan was stopped. STAC item filtering was then implemented and the small downloads succeeded. DuckDB's spatial extension was blocked by Windows application policy, so the working implementation uses Shapely and pyproj for geometry operations and needs only httpfs for remote Parquet.
+The full graph is visible in the running Dagster UI. Its initial combined run exposed shared-volume permissions on Windows. The local Compose service was corrected and the next full graph run succeeded. That failure is retained in the genuine run history.
 
-The dashboard is generated HTML with offline SVG and an interactive depot filter. Its content is covered by an integration test. Cross-browser visual testing has not been performed.
+Live AWS execution, IAM/database bootstrap, Glue runtime compatibility, private routing, and cloud costs remain unverified. No SDK-stub test is presented as a real AWS service run. GitHub CI is configured but has not run remotely.
 
-National ingestion, distributed spatial joins, production CDC retention, S3 uploads, and actual Fargate execution have not been validated. The GitHub workflow has not run on GitHub. Do not present those capabilities as demonstrated deployments.
-
-
+National coverage and performance are not claimed. The map-change teaching scenario is explicitly synthetic unless an actual previous snapshot is supplied. Building accessibility concerns sampled roads, not routing or real travel time.

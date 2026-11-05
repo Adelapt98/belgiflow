@@ -1,9 +1,9 @@
-# Implementation ledger
+# Implementation status
 
-The requested project has progressed from the initial baseline to a working local release. See README.md, docs/VERIFICATION.md, and ROADMAP.md for current evidence and remaining work.
+BelgiFlow now has fourteen independently launchable, date-partitioned Dagster jobs and a complete local graph. Its purpose is Belgian logistics data engineering education through operational coverage, capacity, SLA, geographic accessibility, and reliable publication use cases.
 
-Original constraints: Belgium, batch processing, no AI in the product, no personal operational records, genuine incremental commits, MIT original code, separate map-data attribution, and no publishing or billable provisioning without authorization.
+The public input path uses actual Overture map data. Offline geographic fixtures and operational scenarios are explicitly labeled. There are no AI features or real personal operational records.
 
-Python 3.12 was installed locally for compatibility. Docker Desktop was started to verify PostgreSQL and Spark. No host Java installation was needed because Spark ran in Docker.
+Local execution, cloud adapter contract tests, and Terraform validation are documented separately from future live AWS execution. No cloud deployment, production users, or BYOP acceptance is claimed.
 
-BYOP requires real work, genuine ownership and history, an accepted license, public submission, and substantive planned development. A commit count alone does not establish eligibility or acceptance. The repository has not been published.
+The Git history records development as it happened, including corrections and verification. No repository has been pushed or published.

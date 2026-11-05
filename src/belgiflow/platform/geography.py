@@ -37,7 +37,7 @@ def geographic_reference(store, mode='cached', legacy_root='data'):
         return store.json('geographic_reference',json.loads(objects['geographic_reference']))
     if mode == 'live':
         from ..overture import discover, boundary, download
-        release = discover()
+        release = os.getenv('BELGIFLOW_OVERTURE_RELEASE') or discover()
         boundary(release, legacy / 'reference' / 'belgium.geojson')
         for kind in ['building', 'segment', 'connector']:
             download(release, kind, (4.35, 50.84, 4.351, 50.841), legacy / 'raw' / 'smoke' / f'{kind}.parquet')

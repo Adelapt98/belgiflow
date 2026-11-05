@@ -14,11 +14,14 @@ def main():
     parser.add_argument('--root',default='data/platform')
     parser.add_argument('--source-mode',choices=['fixtures','cached','live','s3'],default='fixtures')
     parser.add_argument('--shipments',type=int,default=300)
+    parser.add_argument('--release',help='optional Overture release pin for live map ingestion')
     args=parser.parse_args()
     from .catalog import PIPELINES
     if args.command=='list':
         print(json.dumps([dict(job=name,purpose=purpose,concepts=concepts) for name,purpose,concepts in PIPELINES],indent=2))
         return
+    if args.release:
+        os.environ['BELGIFLOW_OVERTURE_RELEASE']=args.release
     temp=Path('.tmp').resolve()
     temp.mkdir(exist_ok=True)
     tempfile.tempdir=str(temp)

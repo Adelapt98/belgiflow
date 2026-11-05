@@ -1,30 +1,28 @@
-# Data dictionary and contracts
+# Data dictionary
 
-| Dataset | Grain and identity | Time and update behavior |
+| Product | Grain or key | Storage and update behavior |
 | --- | --- | --- |
-| Raw map sample | Feature ID within theme and pinned release | Immutable observed release, checksum-verified reuse |
-| Silver map features | Unique feature ID per clipped output | Clipped against the Belgian land polygon |
-| Event ledger | Event ID, highest accepted revision | Event time is timezone-aware, batch observation is UTC |
-| Quarantine | Batch content hash and rejected position | Blocks publication until investigated |
-| Outbox | PostgreSQL change ID | Written in the same transaction as the depot change |
-| CDC journal | Source change ID for one source and consumer | Committed locally before source acknowledgement |
-| Depot history | Entity ID and effective timestamp | Half-open validity intervals, current flag, stable surrogate key |
-| Shipment coverage | Shipment ID | Uses the service policy effective when the shipment was created |
-| dbt shipment fact | Shipment ID | Creation, delivery, and cancellation derived from accepted events |
-| Depot mart | Depot ID | Shipment, delivered, and on-time counts |
+| Geographic reference | One pinned reference per selected cohort | JSON geometry and provenance, public or explicit fixture |
+| Map features | Kind and feature ID within release | WKB geometry in Parquet, exact reference-polygon filtering |
+| Shipment source | Event delivery in a business-date cohort | Synthetic deterministic batches with duplicate deliveries |
+| Accepted events | Scenario and event ID, highest revision | Durable SQLite ledger and partitioned Parquet |
+| Reference changes | Source change identity or labeled fixture revision | PostgreSQL outbox journal or offline scenario |
+| Depot history | Entity and effective timestamp | Half-open SCD Type 2 intervals and stable surrogate key |
+| Service coverage | Shipment ID | Historical policy match and metric radius decision |
+| Capacity plan | Date, depot, policy key | Workload, capacity utilization, excess shipment count |
+| Shipment fact | Shipment ID | dbt incremental affected-key rebuild |
+| Delivery SLA | Date and depot | Shipments, delivered, cancelled, on time, average delivery minutes |
+| Building accessibility | Building feature ID | Distance to nearest sampled road |
+| Map audit | Feature identity and comparison scope | Added, removed, modified IDs with explicit provenance |
+| Observability | Dataset and selected cohort | Artifact age, bytes, row counts, verified checksum |
+| Lake generation | Content hash of tables and geographic objects | Immutable files, COPY manifests, completion pointer |
+| Serving warehouse | Explicit per-table keys | Local transaction or Redshift staged transactional replacement |
+| Catalog partition | Date and generation | Local schema registry or Glue Data Catalog registration |
 
-## Time and correction semantics
+The cohort date uses Europe/Brussels. Event timestamps are UTC. Events crossing midnight retain their cohort identity. A late revision is not discarded because its event timestamp is old.
 
-Timestamps are UTC with timezone offsets. Brussels business-time conversion must account for daylight-saving changes. A higher event revision replaces an earlier version of the same logical event. Equal revisions with conflicting payloads are rejected rather than selecting an arbitrary winner.
+Current policy history is effective-time history. Source deletion has no separate business-effective timestamp, so its tombstone uses observed deletion time. Full bitemporal reporting is future work.
 
-Cancellation excludes a shipment from delivered and on-time counts. On-time delivery requires delivery between creation and the synthetic 24-hour commitment. Incomplete shipments remain in total shipments.
+The local warehouse accumulates accepted events and shipment facts across dates. Partition artifacts retain coverage and capacity history. Some local staging reference tables represent the currently processed cohort, while serving replication uses explicit date-and-identity keys.
 
-Historical depot changes rebuild effective-time intervals so a late-effective update can split existing history. CDC deletions use their observed deletion time as the effective tombstone because the source delete operation supplies no separate business-effective timestamp.
-
-## Consistency limits
-
-The source outbox is transactional. Source-to-journal delivery is at least once with idempotent inserts. Per-row acknowledgements avoid skipping a transaction that commits after a higher change ID has already been processed.
-
-There is no distributed transaction across PostgreSQL, SQLite, Parquet, DuckDB, and publication. Derived outputs can be rebuilt from durable accepted inputs. Publication uses immutable content files and an atomic local pointer. The warehouse and dashboard support a single active local writer.
-
-The current event ledger rejects incompatible data. A general automatic schema-migration framework is not implemented. Unknown geographic reporting regions, full road-network topology, and routed travel distances are outside the initial operational mart.
+No distributed transaction spans the source database, local journals, object storage, dbt, and serving warehouse. Idempotent writes, retained source identities, checksums, and explicit publication boundaries support recovery.

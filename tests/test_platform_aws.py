@@ -76,3 +76,18 @@ def test_private_cloud_geography_bundle_preserves_source_provenance(clone,tmp_pa
     reference=geographic_reference(remote,'s3')
     assert reference['provenance']['mode']=='synthetic_geometry_fixture'
     assert map_features(remote,'s3')['rows']==clone.read_json('map_features_manifest')['rows']
+
+
+def test_glue_dispatch_uses_the_shared_compaction_contract(clone,monkeypatch):
+    from belgiflow.platform.spark import compact
+    client=boto3.client('glue',region_name='eu-west-1',aws_access_key_id='testing',aws_secret_access_key='testing')
+    storage=S3Recorder()
+    monkeypatch.setattr(boto3,'client',lambda name:storage)
+    with Stubber(client) as stub:
+        stub.add_response('start_job_run',{'JobRunId':'jr_example'},dict(JobName='compaction',Arguments=ANY))
+        stub.add_response('get_job_run',{'JobRun':{'Id':'jr_example','JobRunState':'SUCCEEDED'}},
+                          dict(JobName='compaction',RunId='jr_example'))
+        result=compact(clone,backend='glue',glue_job='compaction',bucket='example-bucket',client=client)
+        assert result['status']=='SUCCEEDED'
+        assert storage.calls[0][1].endswith('.parquet')
+        stub.assert_no_pending_responses()

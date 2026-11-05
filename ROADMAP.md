@@ -1,37 +1,31 @@
 # Development roadmap
 
-## Working local release
+## Implemented local platform
 
-- Real pinned Overture building, road-segment, connector, and national-boundary ingestion.
-- Exact polygon filtering and projected straight-line distance calculations.
-- Incremental synthetic event ledger, correction handling, replay, quarantine, and publication checksums.
-- Transactional PostgreSQL change capture with commit-order and interruption tests.
-- Effective-time depot history connected to service coverage.
-- Parquet and DuckDB outputs, dbt shipment models and reconciliation.
-- Dagster workflow and a dashboard published from tested dbt marts.
-- Executed Spark batch processing and pipeline-Parquet integration.
-- Docker packaging, locked dependencies, CI configuration, and locally validated Terraform.
+Fourteen independently launchable Dagster jobs now cover geographic reference, daily shipment ingestion, depot history, service coverage, delivery SLAs, capacity planning, building accessibility, map audits, Spark compaction, quality, lake publication, warehouse replication, dashboard review, and catalog registration.
 
-## Reliability and national coverage
+Implemented concepts include date partitioning, durable incremental ingestion, transactional CDC, effective-time SCD Type 2, late revisions, affected-key dbt builds, temporal and spatial joins, Parquet compaction, immutable manifests, SDK-backed cloud adapters, and transactional serving replication.
 
-Build a tile planner with resource estimates, per-partition retries, restartable scheduling, and nation-wide feature deduplication. Verify Belgian national workloads on measured disk and memory budgets. Add region-level marts and explicit treatment of cross-border road-network references.
+## Reliability and national scale
 
-Extend source schema contracts and compatibility checks across retained releases. Add connector integrity checks and actual two-release map-change reports. The current snapshot comparison has synthetic fixture coverage.
+Implement a resource-aware national tile planner, resumable tile scheduling, and cross-tile feature deduplication. Validate actual Belgian national workloads and road-network references. Extend source schema compatibility checks and quantify the limits of sampled-road accessibility metrics.
 
-## Historical operations
+Add source-instance identity checks, multi-consumer outbox retention, journal restoration drills, and a reviewed quarantine-resolution workflow. Improve concurrent-writer support beyond the deliberately serialized local setup.
 
-Add date-partitioned event ingestion and Dagster backfill jobs, configurable service commitments, and richer synthetic cancellation and correction scenarios. Add bitemporal reporting where business-effective time differs from observation time.
+## Richer operational scenarios
 
-Develop a reviewed quarantine resolution workflow and multi-consumer outbox retention policies. Add source-instance identity checks and disaster-recovery drills for journal loss and database restoration.
+Add synthetic transfers between depots, variable service commitments, returns, and capacity changes during the business day. Introduce business-effective versus observation-time reporting where bitemporal semantics are needed. Expand regional reporting using verified geographic divisions.
 
-## Distributed geospatial processing
+## Geographic development
 
-Measure the threshold where spatial SQL becomes a bottleneck. Evaluate Sedona for large spatial joins, compare outputs against the local reference, and only adopt it when results and operational costs justify the additional runtime.
+Build genuine retained-release map comparisons alongside the controlled teaching scenario. Add road-network topology validation and routing experiments only with clear separation from real traffic or actual travel-time claims.
 
-## Product and deployment
+## Authorized cloud execution
 
-Add regional filters, service-zone overlays, coverage exception inspection, and persistent run-health reporting to the dashboard. Keep synthetic and public geographic records visibly distinct.
+Deploy the implemented optional AWS architecture only after approval. Bootstrap database privileges, execute actual S3 publication and Glue jobs, test Redshift COPY and dbt, verify network routes, and measure costs and recovery. Offline SDK contracts do not substitute for these checks.
 
-Execute an authorized AWS deployment, test actual ECR-to-Fargate execution and S3 publication, and verify teardown and costs. Add cloud recovery and access-control tests before calling it a supported deployment.
+## Product and educational use
 
-These are genuine future engineering milestones. No users, production deployment, national-scale performance, or program acceptance is claimed.
+Add guided exercises that intentionally introduce late corrections, failed contracts, partial uploads, and recoverable warehouse failures. Explain the expected observations in Dagster. Improve the dashboard with partition selection, geographic overlays, coverage exception inspection, and historical run-health comparisons.
+
+This is genuine planned work. The project does not claim production users, a national deployment, live cloud validation, or guaranteed BYOP acceptance.

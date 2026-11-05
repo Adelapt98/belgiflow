@@ -1,124 +1,134 @@
 # BelgiFlow
 
-BelgiFlow is a Belgium-focused batch data platform for exploring how a logistics company could ingest, reconcile, and analyze operational and geographic data. It combines real Overture map features with deterministic synthetic shipments and fictional depot policies.
+BelgiFlow is a Belgian logistics data engineering learning platform. It uses public map data and synthetic operational records to answer concrete questions about delivery coverage, depot workload, delivery reliability, and the quality of the data behind those decisions.
 
-The project is intended for data engineering practice and continued personal development. It has no AI features, real customers, driver tracking, or real delivery records.
+The repository is intended for developers learning to build and operate connected batch data products. Each pipeline has its own business purpose, output, and engineering concepts. The same project supports a fully local execution path and an optional AWS implementation.
 
-## What works
+Original software is personally maintained by Adel (Adelapt98). The product contains no AI functionality and processes no real customers, drivers, or shipment histories.
 
-- Release-pinned Overture acquisition using STAC file extents, bounded remote queries, checksums, and cached metadata.
-- Real Belgian country-boundary extraction and exact geometry clipping.
-- Independently downloaded building, road-segment, and connector samples near Brussels.
-- Durable incremental event ingestion, revision handling, quarantine, replay, and checksum-verified publication.
-- PostgreSQL transactional outbox with per-change acknowledgements that tolerate transactions committing out of ID order.
-- Effective-time depot history and historical service-radius coverage checks.
-- Parquet outputs, DuckDB warehouse, dbt shipment and depot models, and reconciliation tests.
-- A Dagster workflow that runs operations, builds and tests dbt models, then publishes an HTML dashboard.
-- A separate Spark batch pipeline that reads the operational Parquet output or generates a larger synthetic workload.
-- Optional Docker packaging and Terraform configuration for AWS storage and an on-demand Fargate task.
+## Purpose
 
-National Belgian downloads are configurable but have not been executed or scale-validated. Actual live validation used a small Brussels area and the national boundary. AWS resources have not been provisioned. Kubernetes and distributed spatial processing are deferred.
+- Explain which synthetic shipments fall outside the depot policy effective when they were created.
+- Identify overloaded depots and distinguish capacity problems from geographic coverage problems.
+- Measure delivery SLA outcomes without counting cancellations as successful deliveries.
+- Analyze building distance to sampled roads and audit changes between map snapshots.
+- Teach incremental loading, partitioning, CDC, SCD Type 2, temporal and spatial joins, reconciliation, distributed processing, and warehouse publication through runnable examples.
 
-## Quickstart
+This is an educational operations platform for a fictional company. It does not claim real logistics customers, production usage, or a production deployment.
 
-Use Python 3.12 and run commands from the repository root. Create and activate a virtual environment first, or use uv.
+## Fourteen pipelines in Dagster
+
+| Job | Main output | Engineering focus |
+| --- | --- | --- |
+| `01_geographic_reference` | Pinned geographic reference and clipped map features | Source provenance, release pinning, geometry validation |
+| `02_daily_shipment_ingestion` | Accepted daily shipment event cohort | Partitions, incremental ledger, deduplication, late revisions |
+| `03_depot_cdc_history` | Historical depot policies | Transactional outbox, replay, delete tombstones, SCD Type 2 |
+| `04_service_coverage` | Shipment-level coverage exceptions | Temporal policy joins, projected distances |
+| `05_delivery_sla` | Shipment facts and SLA marts | dbt affected-key incremental rebuilds and relational tests |
+| `06_depot_capacity` | Depot utilization and excess workload | Aggregation grain, historical capacity |
+| `07_building_accessibility` | Building distance to sampled roads | Spatial indexing and nearest geometry |
+| `08_map_change_audit` | Added, removed, changed feature IDs | Snapshot comparison, explicit change provenance |
+| `09_spark_compaction` | Distributed compacted event files | PySpark, partitioned Parquet, distributed reconciliation |
+| `10_quality_observability` | Quality and freshness reports | Contracts, checksums, cross-product reconciliation |
+| `11_lake_publication` | Immutable data-product bundle | S3 or local storage, manifests, completion pointers |
+| `12_warehouse_replication` | Serving warehouse and tested dbt models | Transactional staging and replacement, Redshift COPY |
+| `13_operations_dashboard` | Operational review dashboard | Quality-gated business metrics and provenance |
+| `14_catalog_registration` | Registered event schema and partition | Local schema registry or AWS Glue Data Catalog |
+
+Jobs include their upstream dependencies so they can be launched independently. `full_platform_demo` executes the entire graph, including Spark and serving replication. These jobs share datasets rather than repeating one demonstration under different names.
+
+## Start the interface
+
+Install Docker Desktop and start its engine. From the repository root:
 
 ```bash
-uv sync --frozen --extra dev --extra analytics --extra orchestration --extra postgres
-uv run --no-sync python -m belgiflow.cli --full-demo --shipments 1000
-uv run --no-sync python scripts/verify_dagster.py
+docker compose --profile ui up -d --build dagster spark-worker
 ```
 
-The first command downloads dependencies. The two demo commands then work without AWS or external map access. The Dagster verification runs dbt and publishes its mart results to the dashboard.
+Open http://localhost:3000 and select **Jobs**. Choose a job and a date partition, such as `2026-01-03`. The complete graph is available under **Assets**.
 
-Alternatively, install the locked runtime with pip, followed by the local package and test tools:
+The local UI uses one concurrent run to protect its shared warehouse. Start with `13_operations_dashboard`, then try `full_platform_demo`. The Spark worker must be running for job 09 and the full graph.
+
+Geography defaults to cached public inputs in the Python resource. For a fresh checkout with no downloaded map data, set the resource configuration `source_mode: fixtures` in the launchpad. To use actual Overture inputs, follow [the source guide](docs/SOURCES.md). Every output identifies whether geography is public or synthetic.
+
+The local UI and worker use root inside their containers for Windows bind-mount compatibility. The application image itself defaults to an unprivileged user. No Docker socket is mounted into either service.
+
+## Run without the interface
+
+Use Python 3.12 and install the locked runtime:
 
 ```bash
 pip install -r requirements.lock.txt
 pip install -e . --no-deps
-pip install pytest==9.2.0
-python scripts/verify_dagster.py
+python -m belgiflow.platform.cli list
+python -m belgiflow.platform.cli run --pipeline 13_operations_dashboard --date 2026-01-03 --source-mode fixtures
 ```
 
-Open `data/dashboard/index.html` in your browser. It has a depot filter, synthetic operational metrics, and a Belgian outline when the real boundary has been downloaded. Without that download, the offline demo intentionally shows depot points without claiming a real country outline.
-
-For the Dagster development interface:
+Or use uv with the matching extras:
 
 ```bash
-dagster dev -m belgiflow.definitions
+uv sync --frozen --extra dev --extra analytics --extra orchestration --extra postgres --extra cloud --extra redshift
+uv run --no-sync python -m belgiflow.platform.cli run --pipeline 13_operations_dashboard --date 2026-01-03 --source-mode fixtures
 ```
 
-Run the `offline_operations` job. The daily schedule uses Europe/Brussels time. A single local writer should own the warehouse and publication directory.
+The dashboard is written to `data/platform/index.html`. Date-partitioned Parquet, JSON reports, dbt logs, and dashboard snapshots are stored under `data/platform/partitions/YYYY-MM-DD/`.
 
-## Download real Belgian map data
+The original small CLI under `belgiflow.cli` remains available for compatibility and initial public-map acquisition. The expanded platform entry point is `belgiflow.platform.cli`.
+
+## Real public map inputs
 
 ```bash
-python -m belgiflow.cli --refresh-map demo --release 2026-10-21.0 --full-demo
+python -m belgiflow.platform.cli run --pipeline 01_geographic_reference --date 2026-01-03 --source-mode live --release 2026-10-21.0
+python -m belgiflow.platform.cli run --pipeline 13_operations_dashboard --date 2026-01-03 --source-mode cached
 ```
 
-Omit `--release` to discover a current release once for that run. A release can disappear from the provider's retention window. If so, choose an available release and record that change.
+If that release is no longer retained, omit the release argument to discover a current one once. Live ingestion populates the expanded platform's cache layout consistently before cached analytical jobs run.
 
-The command retrieves the Belgian land boundary, then a small Brussels sample of buildings, transportation segments, and connectors. Raw inputs keep their acquisition envelope. Silver outputs are clipped against the exact national polygon.
+Public input acquisition uses Overture STAC and GeoParquet. The national polygon is real. Initial live validation uses a small Brussels building and road sample. Full-country scaling is not claimed.
 
-The `belgium` profile requests the national acquisition envelope. It is a larger experimental workload, not a demonstrated national deployment. It can exceed local resources or the five-minute query deadline. Start with the demo and read [the runbook](docs/RUNBOOK.md) before increasing scope.
+Synthetic event dates are scenario dates. A current map snapshot does not establish historical road conditions on those dates. Distances are straight-line metric distances and nearest sampled-road distances, not routing or real travel times.
 
-No API key or AWS account is required for public-source access. The first run needs internet access for STAC metadata, Parquet range requests, and DuckDB's official httpfs extension.
-
-## PostgreSQL change capture
-
-```bash
-docker compose up -d postgres
-```
-
-The database is disposable development infrastructure with trust authentication and a localhost-only published port. Do not use this configuration on a shared or publicly accessible machine.
-
-Set `BELGIFLOW_DSN` to the local connection string shown in `.env.example`. Environment files are examples only and are not loaded automatically.
-
-```python
-import os
-from belgiflow.cdc import seed_demo
-seed_demo(os.environ['BELGIFLOW_DSN'])
-```
-
-The Dagster operational asset consumes that source when the variable is set. Without it, the offline workflow uses invented versioned policies directly. Each consumer needs a persistent journal paired with its own acknowledgement identity. Do not delete a journal while retaining its source acknowledgements.
-
-## Spark
-
-A Docker-based Spark runtime avoids requiring Java on the host. From a POSIX shell:
-
-```bash
-docker run --rm --user root -v "$PWD/jobs:/jobs:ro" -v "$PWD/data:/data" apache/spark:3.5.3 /opt/spark/bin/spark-submit /jobs/spark_events.py --input /data/silver/events.parquet --shipments 1000 --output /data/spark
-```
-
-On PowerShell, replace the volume paths with absolute Windows paths. For a larger independent workload, omit `--input` and use `--shipments 100000`. Results are synthetic. A local two-worker run is not evidence of cluster-scale performance.
-
-## Architecture
+## Infrastructure
 
 ```mermaid
 flowchart LR
-  O[Overture STAC and GeoParquet] --> M[Python map ingestion]
-  M --> G[Belgian boundary filtering]
-  G --> P[Geographic Parquet]
-  S[Synthetic shipment batches] --> L[Durable event ledger]
-  PG[PostgreSQL depot changes] --> C[Outbox and local journal]
-  C --> H[Effective-time dimensions]
-  L --> W[DuckDB and Parquet]
-  H --> W
-  W --> D[dbt models and checks]
-  D --> UI[HTML dashboard]
-  W --> SP[Spark batch processing]
-  A[Dagster] -. orchestrates .-> W
-  A -. orchestrates .-> D
+  M[Overture or explicit fixtures] --> G[Geographic reference products]
+  E[Synthetic daily event batches] --> L[SQLite incremental ledger]
+  P[Optional PostgreSQL outbox] --> H[SCD Type 2 policy history]
+  L --> C[Coverage and capacity]
+  H --> C
+  G --> A[Building accessibility and map audit]
+  C --> D[DuckDB and dbt]
+  D --> Q[Quality and observability]
+  A --> Q
+  L --> S[Local Spark worker or AWS Glue]
+  Q --> O[Immutable local lake or S3]
+  O --> W[Local serving warehouse or Redshift]
+  W --> R[dbt serving models and checks]
+  O --> GC[Local schema registry or Glue Catalog]
+  Q --> UI[Operational dashboard]
 ```
 
-Map features provide geographic context. They do not establish real traffic, travel times, demand, or shipment movement. Operational coverage currently uses synthetic depot policies and projected straight-line distances, not road routing.
+Local infrastructure uses Python, PostgreSQL, SQLite, Parquet, DuckDB, dbt, Dagster, and a separate Spark container. Kubernetes is unnecessary for this initial deployment because Glue provides the optional managed Spark execution path.
 
-## Verification and limits
+Optional Terraform declares S3, ECR, CloudWatch, IAM, ECS Fargate, Glue, Glue Catalog, private networking, and Redshift Serverless. Analytics resources require `enable_analytics=true`. No cloud resources are provisioned by local commands or tests.
 
-See [the verification report](docs/VERIFICATION.md), [data contracts](docs/DATA_DICTIONARY.md), [sources](docs/SOURCES.md), [runbook](docs/RUNBOOK.md), and [roadmap](ROADMAP.md).
+See [AWS deployment preparation](docs/AWS.md) for the backend switch, temporary IAM credentials, database bootstrap permissions, private networking, and cost controls. AWS execution remains unverified until an authorized deployment.
 
-The GitHub workflow is configured but has not run on GitHub because this repository has not been published. Local checks are reported separately. This is a tested local project, not a production-ready logistics system.
+## Tests and project status
 
-## License
+```bash
+pip install pytest==9.2.0
+python -m pytest tests -q
+python scripts/verify_dagster.py
+```
 
-Original code is MIT licensed, copyright Adel (Adelapt98). Overture-derived datasets retain their applicable source licenses. They are excluded from Git and are not relicensed under MIT. See [source attribution](docs/SOURCES.md).
+The PostgreSQL integration test requires `BELGIFLOW_TEST_DSN` pointing to a separate disposable test database. It truncates project tables there. Offline AWS tests use SDK stubs and do not contact AWS.
+
+See [verification](docs/VERIFICATION.md), [pipeline contracts](docs/PIPELINES.md), [runbook](docs/RUNBOOK.md), and [roadmap](ROADMAP.md). GitHub CI is configured but has not run remotely because the repository has not been published.
+
+## Ownership and licenses
+
+Original software is MIT licensed, copyright Adel (Adelapt98). Public datasets keep their original licenses and attribution obligations. Downloaded and generated datasets, credentials, state files, and private configuration are excluded from Git.
+
+The repository is being prepared as an original personal project with genuine development history and substantial continued engineering work. BYOP eligibility and acceptance are decided by the organizers.

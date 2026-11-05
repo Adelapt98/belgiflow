@@ -1,77 +1,77 @@
 # Runbook
 
-## Local profiles
-
-The default demo is deterministic and does not download map data. `--full-demo` also writes Parquet, historical coverage, the warehouse, and an offline HTML dashboard. `scripts/verify_dagster.py` runs the complete operational workflow through dbt validation before final dashboard publication.
-
-The real-map demo is intentionally small. `--refresh-map demo` obtains the national polygon and three feature samples. A raw rectangle is not the national boundary. Silver outputs are clipped against the Belgian land polygon.
-
-The `belgium` profile is experimental. It requests substantially more data and may hit the one-gigabyte DuckDB memory limit or five-minute query deadline. National tiling, aggregate deduplication, resumable partition scheduling, and full-country performance validation remain planned work. Do not interpret the presence of a national option as evidence of national-scale execution.
-
-## Replay and backfill
-
-`Ledger.ingest` identifies batches by their content hash and retains the highest accepted event revision. Replaying the same batch does not add duplicate events. Ingest a corrected batch with higher logical event revisions to change accepted records.
-
-Operational Parquet and warehouse tables are derived snapshots. Rebuild them by rerunning the pipeline. Do not manually edit published JSON files. The publication pointer verifies its referenced file checksum.
-
-A production date-partitioned backfill scheduler is not implemented. Use the ledger API for bounded historical batches and validate the resulting snapshots. The Dagster job currently orchestrates a complete local refresh of accepted operational data.
-
-## Failures and recovery
-
-- Failed source download: the final manifest is absent. Rerun the same pinned release and extent. Completed checksummed files are reused. An incomplete Parquet file is not treated as complete.
-- Invalid source geometry: exact clipping fails rather than silently publishing it.
-- Bad operational record: inspect `quarantine` in the SQLite ledger. A critical quarantine blocks new publication. Fix the source and resolve the quarantine explicitly after review. There is no automatic discard command.
-- Conflicting revision: the entire incremental batch rolls back. Supply an unambiguous higher revision.
-- Crash before CDC acknowledgement: replay the unacknowledged changes. Local journal primary keys deduplicate them.
-- Lost CDC journal: do not reuse the existing source acknowledgement identity. Restore the journal from backup or deliberately initialize a new consumer and replay all retained source changes.
-- Failure after a warehouse write: rerun from the durable ledger. Do not run concurrent local writers.
-- Failed dbt check: the final Dagster dashboard asset does not execute. A previous dashboard may still exist and must not be mistaken for a successful current run.
-
-Source outbox retention is intentionally not automated. Never purge source changes required by a consumer or an audit rebuild.
-
-## Tests
+## Start and stop
 
 ```bash
-python -m pytest tests -q
-python scripts/verify_dagster.py
+docker compose --profile ui up -d --build dagster spark-worker
+docker compose --profile ui stop dagster spark-worker
 ```
 
-The PostgreSQL integration test is skipped unless `BELGIFLOW_TEST_DSN` is set. It truncates project tables in the selected database. Use only a separate disposable test database. Never point it at a source database you want to retain.
+Open http://localhost:3000. Jobs 01 through 14 are separately launchable. Select a date partition such as `2026-01-03`. Each job includes its upstream dependencies. `full_platform_demo` includes the complete graph and requires the Spark worker.
 
-CI defines a disposable PostgreSQL service and a separate Spark job. GitHub execution remains unverified until publication.
+Do not restart an older manually created `belgiflow-dagster` container on the same port. Use the Compose service `belgiflow-dagster-1`.
 
-## Docker
+The local UI mounts the source tree and the expanded `warehouse_dbt` project. Rebuild the image after dependency changes. Reload the code location or restart the UI after graph changes. Read-only project mounts are compatible with dbt because generated logs and targets go to the selected writable data partition.
+
+## Source modes
+
+- `fixtures`: explicitly synthetic geographic data, no external data access.
+- `cached`: previously downloaded Overture boundary and three feature samples.
+- `live`: download public samples and pin one release before processing.
+- `s3`: read a checksummed immutable geographic bundle from the configured lake bucket.
+
+Public data source details are in SOURCES.md. Operational events are synthetic in every mode.
+
+## Daily partitions and backfills
+
+Use Dagster's date-partition selection and backfill controls. One UI run is allowed at a time because the local warehouse is shared. Different cohorts retain their accepted source events and historical dbt shipment facts. Coverage and capacity Parquet artifacts are independently retained per date.
+
+Replaying an unchanged source cohort does not add duplicate events. Higher event revisions rebuild affected shipment identities. Scenario version is explicit so a changed generator does not silently redefine an existing source identity.
+
+Source changes are journaled before acknowledgement. A restarted consumer replays unacknowledged changes safely. Never purge source outbox rows required by a consumer.
+
+## PostgreSQL
 
 ```bash
-docker build -t belgiflow:local .
-docker run --rm belgiflow:local
+docker compose up -d postgres
 ```
 
-Mount a writable local data directory at `/app/data` to retain outputs. The image runs as an unprivileged user. Without a volume, output is discarded when the container is removed.
+The development database uses trust authentication on a localhost-only port. It is disposable local infrastructure. Do not expose it publicly.
 
-## Optional AWS deployment
+Set BELGIFLOW_DSN in the process launching a CLI job, or pass it to the UI container environment. A container reaches a Compose database through `postgres:5432`, not its own localhost. A host process reaches the published development port 55432.
 
-Terraform configuration under `infra` declares private S3 storage, encryption, versioning, incomplete-upload cleanup, ECR, CloudWatch logs, IAM roles, an ECS cluster, and a Fargate task definition.
+Initialize the source with `belgiflow.cdc.seed_demo`. Without a DSN, the history job uses explicitly labeled versioned change fixtures. The PostgreSQL consumer itself has real transactional integration tests.
 
-Validation does not create infrastructure:
+The pytest DSN must reference a separate disposable database. Integration tests truncate project tables in that test database.
 
-```bash
-terraform -chdir=infra init -backend=false
-terraform -chdir=infra validate
-```
+## Recovery
 
-Deployment has not been executed. It requires explicit authorization, standard local AWS credentials, a unique bucket name, and a valid immutable image URI. Build and push the application to ECR, then set `container_image` to its digest. Deploy storage and ECR first using an intentional staged deployment if needed.
+- A source download without a completed manifest is incomplete. Rerun the pinned request.
+- A changed file checksum blocks reading rather than silently accepting corrupted data.
+- A conflicting event revision rolls back its incremental batch.
+- A quarantine or reconciliation failure blocks downstream publication.
+- A failed dbt build retains pending changed shipment IDs for a later retry.
+- A failed upload cannot advance the successful completion pointer.
+- A failed serving-table load rolls back its local transaction. Redshift uses a transactional Data API batch.
+- An interrupted Spark worker requeues claimed requests when its container restarts. Worker requests have a bounded execution deadline and confined file paths.
+- A lost CDC journal requires restoration or a deliberately new consumer identity. Do not retain acknowledgements while discarding the corresponding journal.
 
-Run an ECS task in subnets and security groups you control. The repository does not create a VPC or NAT gateway. Provide network access for ECR image retrieval, CloudWatch logging, and S3 publication. Do not expose PostgreSQL or the dashboard publicly by default.
+A previously published dashboard can remain after a failure. Use Dagster run status and the partition's quality timestamp to distinguish old results from a current successful run.
 
-When `BELGIFLOW_BUCKET` is set, the application uploads the generated dashboard files and checksum pointer under `belgiflow/dashboard`. S3 remains private. The container's default command runs the synthetic workflow, not national map ingestion or Spark.
+## Locations
 
-Charges can include Fargate runtime, ECR storage, logs, S3 versions, requests, and network services. No cost estimate is claimed without a selected workload and region. Before teardown, retain anything needed, remove ECS tasks and ECR images, and explicitly empty all S3 object versions if deleting the bucket. Terraform does not force-delete retained data.
+- `data/platform/state/`: durable accepted-event and CDC journals.
+- `data/platform/partitions/<date>/`: data products, checksums, reports, dbt output, and dashboard snapshots.
+- `data/platform/lake/`: local immutable publication backend.
+- `data/platform/warehouse.duckdb`: ingestion and analytical build warehouse.
+- `data/platform/serving.duckdb`: separately replicated serving warehouse.
+- `data/platform/spark_queue/`: Spark requests, completion reports, and logs.
+- `data/platform/index.html`: latest operational dashboard.
 
-Kubernetes, Glue, Athena, and Sedona have not been added merely as placeholders. Their inclusion requires a concrete workload and further validation.
+All are excluded from Git. Back them up when their recovery history matters.
 
-## Dagster interface in Docker
+## Tests and cloud
 
-On hosts that block native gRPC libraries, run Dagster through the application image. Create `data/dagster` first, then run `docker compose --profile ui up -d dagster` from the repository root. Open http://localhost:3000 and select the `offline_operations` job. The UI profile is optional and binds only to localhost.
+Run `python -m pytest tests -q` and `python scripts/verify_dagster.py`. SDK-stub tests require no AWS account and do not contact AWS. The configured GitHub workflow has not been executed remotely yet.
 
-If a manually started `belgiflow-dagster` container already owns port 3000, use `docker stop belgiflow-dagster` before starting the Compose service. To restart that existing container instead, use `docker start belgiflow-dagster`.
+For optional AWS implementation, read AWS.md. Local tests, parser checks, and Terraform validation are distinct from live Glue or Redshift verification.

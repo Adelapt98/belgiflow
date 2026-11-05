@@ -30,6 +30,8 @@ def overlaps(first, second):
 
 def source_files(release, feature, bbox):
     """Inspect STAC item extents, never guess that collection bbox order maps to files."""
+    if feature not in TYPES or not re.fullmatch(r'\d{4}-\d{2}-\d{2}\.\d+',release):
+        raise ValueError('invalid source selection')
     url = f'https://stac.overturemaps.org/{release}/{TYPES[feature]}/{feature}/collection.json'
     collection = get_json(url)
     cache = Path('data/cache/stac') / release / feature
