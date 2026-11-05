@@ -1,0 +1,2 @@
+[console_scripts]
+belgiflow = belgiflow.cli:main
