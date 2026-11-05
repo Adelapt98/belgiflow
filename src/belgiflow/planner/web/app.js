@@ -175,6 +175,7 @@ async function compare(fit = false) {
     $('export').disabled = false;
     $('csv').href = '/api/export?format=csv&plan=' + result.plan_id;
     $('json').href = '/api/export?format=json&plan=' + result.plan_id;
+    $('decision-insight').textContent = `This option gains ${fmt(result.changes.added_area_km2)} km² and loses ${fmt(result.changes.lost_area_km2)} km² of current coverage. ${fmt(result.proposed.metrics.overlap_area_km2)} km² is served by multiple proposed hubs. It reaches ${result.proposed.metrics.covered_buildings} sampled buildings. Compare these trade-offs before selecting a site. Building counts do not estimate demand.`;
     comparisonTable(result); draw(result, fit);
   } catch (failure) {
     error(failure.message); $('status').textContent = 'Review scenario inputs'; $('export').disabled = true;
@@ -229,3 +230,71 @@ map.on('click', event => {
     renderHubs(); await compare(true);
   } catch (failure) { error('Could not load reference data: ' + failure.message); }
 })();
+
+for (const button of document.querySelectorAll('[data-preset]')) {
+  button.addEventListener('click', () => {
+    if (!bootstrap) return;
+    plan = clone(bootstrap.example); active = 'proposed';
+    if (button.dataset.preset === 'consolidate') {
+      plan.proposed.hubs = plan.proposed.hubs.filter(h => h.id === 'east');
+      plan.proposed.name = 'Eastern hub only';
+    } else if (button.dataset.preset === 'radius') {
+      plan.proposed.hubs = clone(plan.baseline.hubs);
+      plan.proposed.hubs[0].radius_m = 2500;
+      plan.proposed.name = 'Extend current radius to 2.5 km';
+    }
+    $('study-label').textContent = 'Brussels study area'; renderHubs(); compare(true);
+  });
+}
+function rows(id, values) {
+  $(id).replaceChildren(...values.map(row => {
+    const tr = document.createElement('tr');
+    for (const value of row) {const td = document.createElement('td'); td.textContent = value; tr.append(td);}
+    return tr;
+  }));
+}
+function card(title, text, metric=false) {
+  const article = document.createElement('article');
+  const label = document.createElement(metric ? 'span' : 'h3'); label.textContent = title;
+  const value = document.createElement(metric ? 'strong' : 'p'); value.textContent = text;
+  article.append(label, value); return article;
+}
+async function operations(date) {
+  $('operations-status').textContent = 'Reading verified report...';
+  $('operations-content').hidden = true; $('operations-empty').hidden = true;
+  try {
+    const response = await fetch('/api/operations' + (date ? '?date=' + encodeURIComponent(date) : ''));
+    const report = await response.json();
+    if (!response.ok) throw new Error(report.error || 'Report unavailable');
+    $('report-date').replaceChildren(...report.available.map(value => {
+      const option = document.createElement('option'); option.value = value; option.textContent = value; return option;
+    }));
+    if (report.partition) $('report-date').value = report.partition;
+    if (report.status !== 'ready') {
+      $('operations-status').textContent = report.message;
+      $('operations-empty').hidden = report.status !== 'not_built'; return;
+    }
+    const m = report.metrics;
+    $('operations-status').textContent = `Published scenario date ${report.partition}. Quality passed at ${report.checked_at}.`;
+    $('operations-metrics').replaceChildren(
+      card('Synthetic shipments',fmt(m.shipments),true),card('Outside service radius',fmt(m.outside_coverage),true),
+      card('Above centre capacity',fmt(m.excess_shipments),true),card('On time / delivered',m.on_time_pct === null ? 'No deliveries' : fmt(m.on_time_pct)+'%',true));
+    const overloaded = report.capacity.filter(r => r.excess_shipments > 0);
+    const worst = [...report.sla].filter(r=>r.delivered).sort((a,b)=>a.on_time/a.delivered-b.on_time/b.delivered)[0];
+    $('operations-actions').replaceChildren(
+      card('Review capacity',overloaded.length ? `${overloaded.map(r=>r.depot_id).join(', ')} exceed their scenario capacity. Review allocation or capacity before increasing workload.` : 'No centre exceeds its scenario capacity.'),
+      card('Investigate service gaps',`${m.outside_coverage} synthetic shipments fall outside their assigned centre radius. Review the exceptions below. This does not prove that a new hub is the best remedy.`),
+      card('Review delivery reliability',worst ? `${worst.depot_id} has the lowest delivered on-time share at ${fmt(100*worst.on_time/worst.delivered)}%. Investigate process and timing before attributing it to location.` : 'No delivered shipments are available.'));
+    rows('capacity-rows',report.capacity.map(r=>[r.depot_id,r.shipments,r.capacity,fmt(r.utilization*100)+'%',r.excess_shipments,r.outside_coverage]));
+    rows('sla-rows',report.sla.map(r=>[r.depot_id,r.delivered,r.on_time,r.delivered ? fmt(100*r.on_time/r.delivered)+'%' : 'N/A',r.cancelled]));
+    rows('exception-rows',report.exceptions.map(r=>[r.shipment_id,r.depot_id,fmt(r.distance_m)+' m']));
+    rows('health-rows',report.health.map(r=>[r.dataset,r.rows,r.checksum_verified?'Verified':'Not verified',r.stale?'Stale':'Within threshold']));
+    $('report-evidence').textContent = `${m.events} accepted events. Geography: ${report.geography.mode}, release ${report.geography.release}. Operational records are synthetic.`;
+    $('accessibility-evidence').textContent = `${m.buildings} sampled buildings analyzed. ${report.accessibility.over_100m} are over 100 m from a sampled road. Sparse road coverage can affect this metric. It does not establish driving access.`;
+    $('operations-download').href = '/api/operations/export?date='+encodeURIComponent(report.partition);
+    $('operations-content').hidden = false;
+  } catch (failure) { $('operations-status').textContent = 'Report could not be loaded: '+failure.message; }
+}
+$('refresh-operations').addEventListener('click',()=>operations($('report-date').value));
+$('report-date').addEventListener('change',()=>operations($('report-date').value));
+operations();

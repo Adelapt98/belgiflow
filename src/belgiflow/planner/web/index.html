@@ -9,10 +9,15 @@
 <body>
 <header class="topbar">
   <a class="brand" href="/"><span class="brand-symbol">b<span>↗</span></span><strong>BelgiFlow</strong><span class="brand-divider"></span><span class="workspace-name">Network planning</span></a>
-  <nav><a class="nav-active" href="/">Planner</a><a href="http://localhost:3000" target="_blank" rel="noopener">Data pipelines ↗</a><span class="region-pill">● Belgium</span></nav>
+  <nav><a class="nav-active" href="#planning">Plan coverage</a><a href="#operations">Review operations</a><a href="http://localhost:3000" target="_blank" rel="noopener">Data pipelines ↗</a><span class="region-pill">● Belgium</span></nav>
 </header>
 <main>
   <div class="page-heading"><div><div class="eyebrow">SERVICE NETWORK / SCENARIO COMPARISON</div><h1>Plan coverage. Compare the impact.</h1><p>Explore where a new service hub changes your network, before committing to a location.</p></div><div class="heading-actions"><button id="reset" class="button secondary">Reset example</button><div class="export-wrap"><button id="export" class="button primary" disabled>↓ Export report</button><div id="export-menu" class="export-menu" hidden><a id="csv" href="#">Comparison CSV</a><a id="json" href="#">Full analysis JSON</a></div></div></div></div>
+  <section class="use-cases" aria-label="Decisions you can explore">
+<a href="#planning"><strong>01 / Where should we expand?</strong><span>Compare hubs, inspect new coverage and find overlap.</span></a>
+<a href="#operations"><strong>02 / Which centres need attention?</strong><span>Review workload, service exceptions and delivery outcomes.</span></a>
+<a href="#evidence"><strong>03 / Can I trust the result?</strong><span>Inspect sources, report dates and data-quality evidence.</span></a></section>
+<section id="planning" class="quick-start"><div><strong>Try a decision</strong><span>Fictional scenarios, calculated by the real coverage engine.</span></div><button data-preset="expand">Add an eastern hub</button><button data-preset="consolidate">Close the western hub</button><button data-preset="radius">Extend current radius</button></section>
   <section class="metrics" aria-label="Scenario comparison results">
     <article><div class="metric-label">Covered service area <span>PROPOSED</span></div><div class="metric-number" id="area">—</div><div class="metric-detail" id="area-change">Calculating scenario comparison</div><div class="metric-line green"></div></article>
     <article><div class="metric-label">Buildings within coverage <span>SAMPLE</span></div><div class="metric-number" id="buildings">—</div><div class="metric-detail" id="buildings-change">Only the supplied map sample is counted</div><div class="metric-line blue"></div></article>
@@ -41,6 +46,19 @@
     </section>
   </div>
   <section class="comparison-panel"><div class="comparison-heading"><div><h2>Decision summary</h2><p>A reproducible comparison using the same reference data and study area.</p></div><span id="status" class="status-pill">Preparing analysis</span></div><table><thead><tr><th>Planning measure</th><th id="baseline-title">Current network</th><th id="proposed-title">Proposed network</th><th>Change</th></tr></thead><tbody id="comparison-rows"></tbody></table><div class="summary-bottom"><span id="provenance"></span><span>Buildings are geographic observations, not households or demand.</span></div></section>
+  <section class="comparison-panel"><h2>What does this comparison tell you?</h2><p id="decision-insight">Calculate a scenario to see its implications.</p><p class="explain">Shortlist coverage alternatives here. Confirm road access, demand, costs and operating constraints before choosing a site.</p></section>
+<section id="operations" class="comparison-panel">
+<div class="comparison-heading"><div><div class="eyebrow">DAILY OPERATIONS / SEPARATE SCENARIO</div><h2>Find where the network needs attention</h2><p>Editing planner hubs does not change these separately built operational results.</p></div><div><label for="report-date">Report date</label> <select id="report-date"></select> <button class="button secondary" id="refresh-operations">Refresh</button></div></div>
+<p class="data-banner">Synthetic shipments and depot policies. A working demonstration, not real company performance.</p>
+<p id="operations-status" role="status">Loading available reports...</p>
+<div id="operations-content" hidden>
+<div id="operations-metrics" class="ops-metrics"></div><div id="operations-actions" class="action-grid"></div>
+<h3>Which centres are overloaded?</h3><div class="table-scroll"><table><thead><tr><th>Centre</th><th>Shipments</th><th>Capacity</th><th>Utilization</th><th>Excess workload</th><th>Outside radius</th></tr></thead><tbody id="capacity-rows"></tbody></table></div>
+<h3>Where are deliveries missing their target?</h3><p class="explain">On-time share uses delivered shipments as its denominator. Cancellations are separate.</p><div class="table-scroll"><table><thead><tr><th>Centre</th><th>Delivered</th><th>On time</th><th>On-time share</th><th>Cancelled</th></tr></thead><tbody id="sla-rows"></tbody></table></div>
+<details><summary>Inspect the 20 furthest out-of-coverage exceptions</summary><div class="table-scroll"><table><thead><tr><th>Synthetic shipment</th><th>Centre</th><th>Straight-line distance</th></tr></thead><tbody id="exception-rows"></tbody></table></div></details>
+<div id="evidence"><h3>Evidence behind this report</h3><p id="report-evidence"></p><p id="accessibility-evidence" class="explain"></p><div class="table-scroll"><table><thead><tr><th>Dataset</th><th>Rows</th><th>Checksum at build</th><th>Freshness at build</th></tr></thead><tbody id="health-rows"></tbody></table></div><p class="explain">Freshness is recorded when the report is built, not monitored live. Source tables are checksum-verified again when read.</p></div>
+<p><a id="operations-download" class="button primary" href="#">Download operational report JSON</a></p></div>
+<div id="operations-empty" hidden><p>Build a report, then refresh:</p><pre>python -m belgiflow.platform.cli run --pipeline 13_operations_dashboard --date 2026-01-03 --source-mode fixtures</pre><p>Use cached after downloading public geography. Empty panels never substitute invented metrics.</p></div></section>
   <footer class="page-footer"><span>BelgiFlow · Service-network planning for Belgium</span><span>Local-first analysis. Your scenario data stays in this workspace.</span></footer>
 </main>
 </body></html>

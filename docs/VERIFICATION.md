@@ -4,7 +4,7 @@ Verified locally on 5 November 2026. No AWS resources were provisioned.
 
 | Check | Result |
 | --- | --- |
-| Full regression suite | 50 passed, including isolated PostgreSQL integration and offline AWS contracts |
+| Full regression suite | 54 passed, including isolated PostgreSQL integration and offline AWS contracts |
 | Dagster definitions | Fifteen distinct named jobs, twenty-one assets, plus the full graph |
 | Full UI graph | SUCCESS, run `c1ad0619-0df0-43d7-a4e0-2c26569ba0bb` |
 | Full-graph cohort | 300 synthetic shipments and 900 accepted events for 2026-01-03 |
@@ -41,3 +41,11 @@ The actual cached public example produced 6.1569 km² current coverage, 13.2651 
 Browser checks exercised copying the current network, recalculation, resetting the example, inspecting the sample, and choosing the map extent as a study area. The final screenshot is a real interface capture. Job `15_network_planning` succeeded against cached public inputs in run `78c03f57-c305-4d8c-964c-f725818bfe8c`. The local Docker image was rebuilt with the planner and packaged web assets.
 
 A clean temporary application container also loaded the packaged planner, web assets, vendor license, and offline geometry. Saved public reports reproduced the same plan ID, while a changed geographic source fingerprint was rejected.
+
+## Visible decision workflows
+
+After adding the operational results panel, the full suite passed: **54 tests in 65.52 seconds**. New checks cover absent reports, quality-failed reports, invalid dates, checksum failures, and the delivered-shipment denominator.
+
+A clean offline demo built its own report in a new data directory through Dagster and dbt, then served both planning and operational products on port 8081. The HTTP operational export returned its computed figures, and a path-like date was rejected.
+
+Browser checks confirmed three guided decisions. Closing the western hub gained 7.11 km² but lost 5.22 km² elsewhere. Extending the original radius gained 13.48 km² without coverage loss. The operational panel visibly displayed 300 synthetic shipments, 203 outside-radius exceptions, 60 above centre capacity and a 56.52% delivered on-time share, plus per-centre tables and recorded quality evidence. The default expansion example was restored afterward. These figures are scenario results, not real company performance.

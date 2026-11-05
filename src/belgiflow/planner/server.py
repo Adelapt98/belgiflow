@@ -35,7 +35,8 @@ def csv_report(result):
 class PlannerServer(ThreadingHTTPServer):
     daemon_threads = True
 
-    def __init__(self, address, engine, output):
+    def __init__(self, address, engine, output, products_root=None):
+        self.products_root = Path(products_root) if products_root else Path(output).parent.parent / "platform"
         self.engine = engine
         self.output = Path(output)
         self.output.mkdir(parents=True, exist_ok=True)
@@ -70,6 +71,13 @@ class PlannerHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         if parsed.path == '/api/bootstrap':
             return self.send(200, self.server.engine.bootstrap())
+        if parsed.path in {'/api/operations', '/api/operations/export'}:
+            from .products import operational_report
+            try:
+                report = operational_report(self.server.products_root, parse_qs(parsed.query).get('date', [None])[0])
+                return self.send(200, report, filename='belgiflow-operations.json' if parsed.path.endswith('/export') else None)
+            except (ValueError, OSError, KeyError) as error:
+                return self.send(400, {'error': str(error)})
         if parsed.path == '/api/export':
             params = parse_qs(parsed.query)
             identity = params.get('plan', [''])[0]

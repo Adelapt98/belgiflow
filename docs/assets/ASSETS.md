@@ -4,7 +4,7 @@
 
 `planning-report.svg` and its PNG are generated from the actual default comparison against the cached public Brussels sample. The hub choices are fictional. `pipeline-map.svg` is generated from the actual pipeline catalog. `architecture.svg` describes implemented local components and the optional, not-deployed AWS path. Original figure layout is covered by the repository MIT license, excluding third-party marks.
 
-`planner-overview.jpg` and `planner-sample.jpg` are actual local browser screenshots. The latter uses a smaller map-selected study area. Neither is a fabricated production customer case. Public geometry attribution appears in the interface and result figure.
+`planner-overview.jpg`, `operations-panel.jpg` and `planner-sample.jpg` are actual local browser screenshots. The latter uses a smaller map-selected study area. Neither is a fabricated production customer case. Public geometry attribution appears in the interface and result figure.
 
 Generate the SVGs with `python scripts/render_readme_assets.py` after acquiring the public cache. Convert to PNG with `sh scripts/render_svg_png.sh`, using librsvg and DejaVu Sans fonts. The source generator requires the geographic cache to reproduce its example results.
 

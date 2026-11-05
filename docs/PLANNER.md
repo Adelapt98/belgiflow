@@ -27,3 +27,11 @@ Job output is `network_plan.json` and `network_plan.csv` in the chosen platform 
 ## Local service boundaries
 
 The server restricts Host and Origin to its local interface, validates request types and sizes, and serves only packaged web assets. It is not prepared as an internet-facing multi-user service. Leaflet is vendored locally. Optional OpenStreetMap tiles are browser requests and can be disabled for vector-only offline inspection.
+
+## Operational results in the same workspace
+
+The Review operations section reads quality-passed partitions under `data/platform/partitions/`. Select a report date to inspect centre capacity, delivery outcomes, the twenty furthest coverage exceptions and recorded dataset health. The download includes the displayed report. Recommendations are deterministic prompts for investigation, not causal diagnoses or automatic location selection.
+
+When no report exists, the panel displays a build command. Failed quality checks withhold the results. Invalid partitions and checksum failures are rejected. Freshness labels describe the original report build, not current live health. Planner geometry and operational geography can use different sources, so each exposes its own provenance.
+
+`python -m belgiflow.planner.demo` builds the offline operational scenario through the real pipeline before starting the server. It needs the locked runtime and an editable project installation from the repository root. The fixture demo has invented geography. The cached public-data workflow in the README uses the actual Brussels sample instead.
