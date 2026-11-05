@@ -58,11 +58,15 @@ Local execution verifies semantics and outputs. Offline SDK tests validate AWS r
 
 ## 13 Operations dashboard
 
-Publishes quality-gated SLA, capacity, coverage, geographic provenance, and the pipeline catalog. It is an educational operational review interface. The dashboard is generated HTML rather than a hosted multi-user application.
+Publishes quality-gated SLA, capacity, coverage, geographic provenance, and the pipeline catalog. It is the supporting operational review interface, separate from the interactive planning workspace. The dashboard is generated HTML rather than a hosted multi-user application.
 
 ## 14 Catalog registration
 
 Registers the raw event schema and immutable partition in the local schema registry or Glue Data Catalog. Existing Glue partitions are treated as idempotent registrations. The table schema follows the exact ordered Parquet export contract.
+
+## 15 Network planning
+
+Compares current and proposed hub networks using the same projected coverage engine as the planner. Produces JSON and CSV reports with gained and lost area, overlap, sampled-building assignments, and source fingerprints. Set `BELGIFLOW_PLANNING_CONFIG` to a raw request or an exported report. Exported reports must match the current source fingerprint.
 
 ## Backfills and consistency
 

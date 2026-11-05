@@ -4,8 +4,8 @@ Verified locally on 5 November 2026. No AWS resources were provisioned.
 
 | Check | Result |
 | --- | --- |
-| Full regression suite | 35 passed, including isolated PostgreSQL integration and offline AWS contracts |
-| Dagster definitions | Fourteen distinct named jobs, twenty assets, plus the full graph |
+| Full regression suite | 50 passed, including isolated PostgreSQL integration and offline AWS contracts |
+| Dagster definitions | Fifteen distinct named jobs, twenty-one assets, plus the full graph |
 | Full UI graph | SUCCESS, run `c1ad0619-0df0-43d7-a4e0-2c26569ba0bb` |
 | Full-graph cohort | 300 synthetic shipments and 900 accepted events for 2026-01-03 |
 | Data quality | Coverage, capacity, SLA, event identities, and policy history reconciled |
@@ -31,3 +31,13 @@ The full graph is visible in the running Dagster UI. Its initial combined run ex
 Live AWS execution, IAM/database bootstrap, Glue runtime compatibility, private routing, and cloud costs remain unverified. No SDK-stub test is presented as a real AWS service run. GitHub CI is configured but has not run remotely.
 
 National coverage and performance are not claimed. The map-change teaching scenario is explicitly synthetic unless an actual previous snapshot is supplied. Building accessibility concerns sampled roads, not routing or real travel time.
+
+## Interactive planning product
+
+The complete suite passed after adding the planner: 50 tests in 66.50 seconds, including the disposable PostgreSQL database and offline AWS contracts. Fifteen planner checks cover geometric unions, overlap without triple counting, gains and losses, validation, CSV formula safety, exports, local Host/Origin restrictions, and static path containment.
+
+The actual cached public example produced 6.1569 km² current coverage, 13.2651 km² proposed coverage, 7.1082 km² gained, 0.9335 km² overlap, and 58 sampled buildings covered. These are straight-line radius calculations, not routing or demand estimates.
+
+Browser checks exercised copying the current network, recalculation, resetting the example, inspecting the sample, and choosing the map extent as a study area. The final screenshot is a real interface capture. Job `15_network_planning` succeeded against cached public inputs in run `78c03f57-c305-4d8c-964c-f725818bfe8c`. The local Docker image was rebuilt with the planner and packaged web assets.
+
+A clean temporary application container also loaded the packaged planner, web assets, vendor license, and offline geometry. Saved public reports reproduced the same plan ID, while a changed geographic source fingerprint was rejected.

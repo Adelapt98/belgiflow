@@ -1,4 +1,4 @@
-"""Fourteen partitioned data-product pipelines with an explicit dependency graph."""
+"""Fifteen partitioned data-product pipelines with an explicit dependency graph."""
 import os
 from dagster import asset, AssetSelection, ConfigurableResource, DailyPartitionsDefinition, Definitions, MetadataValue, define_asset_job
 from .platform.store import Store
@@ -116,7 +116,7 @@ def serving_models(context,platform: Platform):
     from .platform.warehouse import build_marts
     return build_marts(platform.store(context),target='redshift' if platform.backend=='aws' else 'serving')
 
-@asset(group_name='operational_review',deps=[observability],description='Quality-gated business dashboard and educational pipeline catalog.',**COMMON)
+@asset(group_name='operational_review',deps=[observability],description='Quality-gated operational dashboard and pipeline catalog.',**COMMON)
 def operations_dashboard(context,platform: Platform):
     from .platform.dashboard import render
     target=render(platform.store(context))

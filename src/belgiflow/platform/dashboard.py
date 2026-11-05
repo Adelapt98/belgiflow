@@ -20,7 +20,7 @@ def render(store):
     cap_rows=''.join('<tr>'+cells([r['depot_id'],r['capacity'],r['shipments'],round(r['utilization'],2),r['excess_shipments']])+'</tr>' for r in capacity)
     document=f'''<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
     <title>BelgiFlow operational data products</title><style>body{{font:16px system-ui;background:#eef3f1;color:#153c30;max-width:1250px;margin:30px auto;padding:20px}}section,header{{background:white;padding:25px;border-radius:14px;margin-bottom:20px}}table{{border-collapse:collapse;width:100%}}td,th{{padding:10px;text-align:left;border-bottom:1px solid #ddd}}.metrics{{display:flex;gap:25px;flex-wrap:wrap}}.metric{{font-size:22px}}small{{color:#50665d}}</style>
-    <header><h1>BelgiFlow</h1><p>Belgian delivery coverage and depot operations learning platform</p>
+    <header><h1>BelgiFlow</h1><p>Supporting delivery coverage and depot operations review</p>
     <strong>Synthetic operations. No real customers, drivers, or shipments.</strong>
     <p>Partition: {store.partition} | Geography: {html.escape(source['mode'])} | Release: {html.escape(source['release'])}</p></header>
     <section class="metrics"><span class="metric">{quality['shipments']} shipments</span><span class="metric">{sum(not r['covered'] for r in coverage)} outside service radius</span><span class="metric">{sum(r['excess_shipments'] for r in capacity)} above depot capacity</span><span class="metric">{len(accessible)} building footprints analyzed</span></section>

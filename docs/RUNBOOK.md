@@ -3,11 +3,11 @@
 ## Start and stop
 
 ```bash
-docker compose --profile ui up -d --build dagster spark-worker
-docker compose --profile ui stop dagster spark-worker
+docker compose --profile ui up -d --build planner dagster spark-worker
+docker compose --profile ui stop planner dagster spark-worker
 ```
 
-Open http://localhost:3000. Jobs 01 through 14 are separately launchable. Select a date partition such as `2026-01-03`. Each job includes its upstream dependencies. `full_platform_demo` includes the complete graph and requires the Spark worker.
+Open http://localhost:8080 for planning, after preparing cached geography. Use the Python fixture command in the README for a fresh offline demo. Open http://localhost:3000 for orchestration. Jobs 01 through 15 are separately launchable. Select a date partition such as `2026-01-03`. Each job includes its upstream dependencies. `full_platform_demo` includes the complete graph and requires the Spark worker.
 
 Do not restart an older manually created `belgiflow-dagster` container on the same port. Use the Compose service `belgiflow-dagster-1`.
 

@@ -1,31 +1,31 @@
 # Development roadmap
 
-## Implemented local platform
+## Implemented product
 
-Fourteen independently launchable Dagster jobs now cover geographic reference, daily shipment ingestion, depot history, service coverage, delivery SLAs, capacity planning, building accessibility, map audits, Spark compaction, quality, lake publication, warehouse replication, dashboard review, and catalog registration.
+BelgiFlow compares current and proposed service-hub networks in Belgium. The local workspace supports editable hubs, map-selected study areas, metric radius coverage, overlap, gaps, sampled-building assignments, and reproducible CSV/JSON reports. Fifteen Dagster jobs support geographic reference, planning, synthetic operations, dbt, Spark, quality, publication, and serving.
 
-Implemented concepts include date partitioning, durable incremental ingestion, transactional CDC, effective-time SCD Type 2, late revisions, affected-key dbt builds, temporal and spatial joins, Parquet compaction, immutable manifests, SDK-backed cloud adapters, and transactional serving replication.
+## Reliable comparisons and fuller geography
 
-## Reliability and national scale
+Build resumable geographic tile acquisition with deduplication across boundaries. Offer explicit sample completeness indicators and source freshness in the planner. Validate larger Belgian workloads and retain source releases so saved plans can be reproduced after updates.
 
-Implement a resource-aware national tile planner, resumable tile scheduling, and cross-tile feature deduplication. Validate actual Belgian national workloads and road-network references. Extend source schema compatibility checks and quantify the limits of sampled-road accessibility metrics.
+Add scenario import and a searchable scenario library. Show changes per hub and distinguish gains from coverage transferred between hubs. Improve keyboard access, map interaction, and validation feedback. Add recovery checks for interrupted report writes and concurrent local requests.
 
-Add source-instance identity checks, multi-consumer outbox retention, journal restoration drills, and a reviewed quarantine-resolution workflow. Improve concurrent-writer support beyond the deliberately serialized local setup.
+## More useful network decisions
 
-## Richer operational scenarios
+Support exclusion zones, custom service polygons, and explicit geographic constraints. Add side-by-side comparisons of several alternatives and user-defined scoring weights. Explore public non-personal aggregate demand proxies only with clear provenance and coverage limitations.
 
-Add synthetic transfers between depots, variable service commitments, returns, and capacity changes during the business day. Introduce business-effective versus observation-time reporting where bitemporal semantics are needed. Expand regional reporting using verified geographic divisions.
+Investigate road-network coverage and topology validation. Keep route distance, modeled travel time, and straight-line radius results visibly distinct. Add actual retained-release map comparisons and explain their effect on saved network decisions.
 
-## Geographic development
+## Data reliability and operations
 
-Build genuine retained-release map comparisons alongside the controlled teaching scenario. Add road-network topology validation and routing experiments only with clear separation from real traffic or actual travel-time claims.
+Extend schema compatibility checks, source-instance identity, multi-consumer outbox retention, journal restoration drills, and quarantine resolution. Improve concurrent-writer support beyond the serialized warehouse. Expand synthetic capacity, transfers, returns, and service commitments where they support meaningful operational comparisons.
 
-## Authorized cloud execution
+## Authorized cloud validation
 
-Deploy the implemented optional AWS architecture only after approval. Bootstrap database privileges, execute actual S3 publication and Glue jobs, test Redshift COPY and dbt, verify network routes, and measure costs and recovery. Offline SDK contracts do not substitute for these checks.
+Deploy the optional AWS architecture only after authorization. Exercise real S3 publication, Glue processing, Redshift COPY, dbt serving models, private routing, and database bootstrap. Measure costs, backfill performance, and recovery. Offline contracts are not substitutes for live execution.
 
-## Product and educational use
+## Practical reference material
 
-Add guided exercises that intentionally introduce late corrections, failed contracts, partial uploads, and recoverable warehouse failures. Explain the expected observations in Dagster. Improve the dashboard with partition selection, geographic overlays, coverage exception inspection, and historical run-health comparisons.
+Document the product decisions behind each pipeline and add focused recovery exercises. Keep the working planner as the main product, with data engineering education as a secondary benefit.
 
-This is genuine planned work. The project does not claim production users, a national deployment, live cloud validation, or guaranteed BYOP acceptance.
+These are genuine future development priorities. National completeness, production users, and live cloud validation are not claimed.
