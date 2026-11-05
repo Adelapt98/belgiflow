@@ -1,9 +1,8 @@
 """Public-map reference products and explicit synthetic offline fixtures."""
 import json
 from pathlib import Path
-from shapely import from_wkb, to_wkb
+from shapely import from_wkb, to_wkb, transform
 from shapely.geometry import Point, LineString, box, shape, mapping
-from shapely.ops import transform
 from shapely.strtree import STRtree
 from pyproj import Transformer
 import pyarrow.parquet as pq
@@ -66,7 +65,7 @@ def map_features(store, mode='cached', legacy_root='data'):
 def building_accessibility(store):
     features = store.read('map_features')
     projection = Transformer.from_crs('EPSG:4326','EPSG:3812',always_xy=True).transform
-    roads = [transform(projection,from_wkb(r['geometry'])) for r in features if r['kind']=='segment']
+    roads = [transform(from_wkb(r['geometry']),projection,interleaved=False) for r in features if r['kind']=='segment']
     if not roads:
         raise ValueError('road sample is empty')
     tree = STRtree(roads)
@@ -74,7 +73,7 @@ def building_accessibility(store):
     for row in features:
         if row['kind'] != 'building':
             continue
-        center = transform(projection,from_wkb(row['geometry'])).centroid
+        center = transform(from_wkb(row['geometry']),projection,interleaved=False).centroid
         nearest = roads[int(tree.nearest(center))]
         distance = center.distance(nearest)
         rows.append(dict(building_id=row['feature_id'], nearest_sampled_road_m=distance,

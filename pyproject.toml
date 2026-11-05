@@ -12,6 +12,7 @@ analytics = ["dbt-duckdb>=1.9,<2"]
 postgres = ["psycopg[binary]>=3.2,<4"]
 spark = ["pyspark>=3.5,<3.6"]
 cloud = ["boto3>=1.40,<2"]
+redshift = ["dbt-redshift>=1.9,<2"]
 
 [project.scripts]
 belgiflow = "belgiflow.cli:main"

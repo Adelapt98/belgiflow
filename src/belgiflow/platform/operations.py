@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 import duckdb
 import pyarrow as pa
+from zoneinfo import ZoneInfo
 from ..batch import Ledger
 from ..events import generate
 from ..history import scd2
@@ -17,7 +18,7 @@ DEPOTS = [dict(entity_id=f'DEPOT-{i}', longitude=x, latitude=y)
 
 def shipment_source(store, count=300):
     """Deterministic day cohorts, with duplicate delivery and a genuine revision."""
-    start = datetime.fromisoformat(store.partition).replace(tzinfo=timezone.utc)
+    start = datetime.fromisoformat(store.partition).replace(tzinfo=ZoneInfo('Europe/Brussels')).astimezone(timezone.utc)
     rows = generate(count, seed=int(store.partition.replace('-', '')))
     base = datetime(2026, 1, 1, tzinfo=timezone.utc)
     for row in rows:
@@ -63,7 +64,8 @@ def reference_changes(store, dsn=None):
         rows = []
         for depot in DEPOTS:
             for effective, revision, capacity, radius in [('2026-01-01', 1, 80, 1000), ('2026-01-04', 2, 120, 1800)]:
-                rows.append(dict(entity_id=depot['entity_id'], effective_at=effective + 'T00:00:00+00:00',
+                effective_utc=datetime.fromisoformat(effective).replace(tzinfo=ZoneInfo('Europe/Brussels')).astimezone(timezone.utc).isoformat()
+                rows.append(dict(entity_id=depot['entity_id'], effective_at=effective_utc,
                                  revision=revision, capacity=capacity, radius_m=radius, deleted=False,
                                  observed_at='2026-01-06T00:00:00+00:00'))
         mode = 'synthetic_versioned_change_fixture'
