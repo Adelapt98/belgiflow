@@ -84,7 +84,43 @@ The planner opens on [port 8080](http://localhost:8080) and Dagster on [port 300
 
 The cloud path is implemented with offline contract checks. It has **not been deployed or validated live on AWS**.
 
-[Architecture diagram](docs/assets/architecture.png) · [Pipeline catalog](docs/PIPELINES.md) · [AWS preparation](docs/AWS.md)
+### Architecture and tools
+
+![BelgiFlow architecture with official tool logos](docs/assets/architecture.png)
+
+Python and SQL handle ingestion and analysis. Dagster orchestrates the workflows, dbt builds the analytical models, and PySpark handles the distributed processing path. Docker runs the local services. Terraform defines the optional AWS infrastructure shown above.
+
+### Pipelines
+
+Each named job has a concrete output and includes its upstream dependencies. They share data products rather than representing fifteen separate applications.
+
+| Dagster job | Purpose | Engineering concepts |
+| --- | --- | --- |
+| `01_geographic_reference` | Belgian reference acquisition | Pinned public map snapshots, exact national clipping, source provenance |
+| `02_daily_shipment_ingestion` | Daily shipment cohorts | Date partitions, deduplication, late revisions, durable incremental ledger |
+| `03_depot_cdc_history` | Depot policy history | Transactional outbox, replay, delete tombstones, effective-time SCD Type 2 |
+| `04_service_coverage` | Historical coverage exceptions | Temporal joins, CRS-aware distances, policy-effective service decisions |
+| `05_delivery_sla` | Delivery reliability | dbt incremental affected-key rebuilds, cancellations, on-time metrics |
+| `06_depot_capacity` | Depot workload planning | Capacity utilization, overload identification, correct aggregation grain |
+| `07_building_accessibility` | Map accessibility analysis | Spatial indexing, nearest sampled road, geometric distance |
+| `08_map_change_audit` | Map release audit | Snapshot comparison, additions, removals, geometry changes |
+| `09_spark_compaction` | Large event-batch compaction | PySpark deduplication, partitioned Parquet, local worker or AWS Glue |
+| `10_quality_observability` | Data-product health | Reconciliation, contracts, freshness, checksums, publication gates |
+| `11_lake_publication` | Versioned data-product delivery | Immutable objects, manifests, atomic completion pointer, local store or S3 |
+| `12_warehouse_replication` | Warehouse replication | Staging, idempotent replacement, Redshift COPY manifests, transactional merge |
+| `13_operations_dashboard` | Operational review | Quality-gated marts, provenance, capacity and service exceptions |
+| `14_catalog_registration` | Lake schema discovery | Explicit schema registry, Glue Data Catalog, idempotent partition registration |
+| `15_network_planning` | Service-network scenario comparison | Configurable hubs, projected coverage, overlaps, gaps, and reproducible planning reports |
+
+Open Dagster on [port 3000](http://localhost:3000) to inspect the dependency graph, select a date partition, launch jobs and review logs. `full_platform_demo` runs the complete graph, including the separate Spark worker and serving replication.
+
+```bash
+python -m belgiflow.platform.cli list
+python -m belgiflow.platform.cli run --pipeline 15_network_planning --date 2026-01-03 --source-mode fixtures
+```
+
+[Pipeline contracts and outputs](docs/PIPELINES.md) · [AWS preparation](docs/AWS.md)
+
 
 ## Scope and development status
 
