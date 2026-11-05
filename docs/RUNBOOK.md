@@ -69,3 +69,9 @@ When `BELGIFLOW_BUCKET` is set, the application uploads the generated dashboard 
 Charges can include Fargate runtime, ECR storage, logs, S3 versions, requests, and network services. No cost estimate is claimed without a selected workload and region. Before teardown, retain anything needed, remove ECS tasks and ECR images, and explicitly empty all S3 object versions if deleting the bucket. Terraform does not force-delete retained data.
 
 Kubernetes, Glue, Athena, and Sedona have not been added merely as placeholders. Their inclusion requires a concrete workload and further validation.
+
+## Dagster interface in Docker
+
+On hosts that block native gRPC libraries, run Dagster through the application image. Create `data/dagster` first, then run `docker compose --profile ui up -d dagster` from the repository root. Open http://localhost:3000 and select the `offline_operations` job. The UI profile is optional and binds only to localhost.
+
+If a manually started `belgiflow-dagster` container already owns port 3000, use `docker stop belgiflow-dagster` before starting the Compose service. To restart that existing container instead, use `docker start belgiflow-dagster`.

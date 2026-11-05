@@ -1,4 +1,18 @@
 services:
+  dagster:
+    build: .
+    image: belgiflow:local
+    profiles: [ui]
+    command: [dagster, dev, -m, belgiflow.definitions, -h, 0.0.0.0, -p, "3000"]
+    environment:
+      DAGSTER_HOME: /app/data/dagster
+      PYTHONPATH: /app/src
+      DBT_SEND_ANONYMOUS_USAGE_STATS: "false"
+    ports:
+      - "127.0.0.1:3000:3000"
+    volumes:
+      - ./data:/app/data
+      - ./src:/app/src:ro
   postgres:
     image: postgres:17-alpine
     environment:
