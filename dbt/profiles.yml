@@ -1,0 +1,7 @@
+belgiflow:
+  target: local
+  outputs:
+    local:
+      type: duckdb
+      path: "{{ env_var('BELGIFLOW_WAREHOUSE', '../data/warehouse.duckdb') }}"
+      threads: 2

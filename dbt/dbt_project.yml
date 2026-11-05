@@ -1,0 +1,8 @@
+name: belgiflow
+version: '1.0'
+config-version: 2
+profile: belgiflow
+model-paths: [models]
+models:
+  belgiflow:
+    +materialized: table

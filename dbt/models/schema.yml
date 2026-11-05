@@ -1,0 +1,20 @@
+version: 2
+models:
+  - name: stg_events
+    columns:
+      - name: event_id
+        tests: [unique, not_null]
+      - name: status
+        tests:
+          - accepted_values:
+              values: [created, dispatched, delivered, cancelled]
+  - name: fct_shipments
+    columns:
+      - name: shipment_id
+        tests: [unique, not_null]
+      - name: depot_id
+        tests: [not_null]
+  - name: mart_depots
+    columns:
+      - name: depot_id
+        tests: [unique, not_null]

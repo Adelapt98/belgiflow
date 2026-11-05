@@ -1,7 +1,8 @@
 """Explicit country filtering and metric distances."""
 from shapely.geometry import Point
-from shapely.ops import transform
+from shapely import transform
 from pyproj import Transformer
+from functools import lru_cache
 
 
 def within_country(features, country):
@@ -20,5 +21,10 @@ def within_country(features, country):
 
 
 def distance_meters(first, second):
-    projection = Transformer.from_crs('EPSG:4326', 'EPSG:3812', always_xy=True).transform
-    return transform(projection, Point(first)).distance(transform(projection, Point(second)))
+    projection = _projection().transform
+    return transform(Point(first), projection, interleaved=False).distance(transform(Point(second), projection, interleaved=False))
+
+
+@lru_cache(maxsize=1)
+def _projection():
+    return Transformer.from_crs('EPSG:4326', 'EPSG:3812', always_xy=True)
