@@ -123,12 +123,19 @@ def operations_dashboard(context,platform: Platform):
     context.add_output_metadata({'dashboard':MetadataValue.path(target)})
     return target
 
+@asset(group_name='network_planning',deps=[map_features],description='Compare configurable service-network scenarios using public geography. Produce coverage gains, losses, overlap and sampled-building counts.',**COMMON)
+def network_plan(context,platform: Platform):
+    from .planner.pipeline import planning_product
+    result=planning_product(platform.store(context))
+    context.add_output_metadata(result)
+    return result
+
 ASSETS=[geographic_reference,map_features,shipment_source,accepted_events,reference_changes,depot_history,
         service_coverage,capacity_plan,warehouse_inputs,delivery_sla,building_accessibility,map_change_audit,
-        spark_compaction,quality_report,observability,lake_publication,warehouse_replication,operations_dashboard,catalog_registration,serving_models]
+        spark_compaction,quality_report,observability,lake_publication,warehouse_replication,operations_dashboard,catalog_registration,serving_models,network_plan]
 TERMINALS=[map_features,accepted_events,depot_history,service_coverage,delivery_sla,capacity_plan,
            building_accessibility,map_change_audit,spark_compaction,observability,
-           lake_publication,serving_models,operations_dashboard,catalog_registration]
+           lake_publication,serving_models,operations_dashboard,catalog_registration,network_plan]
 JOBS=[define_asset_job(name,selection=AssetSelection.assets(terminal).upstream(),description=purpose+'. '+concepts)
       for (name,purpose,concepts),terminal in zip(PIPELINES,TERMINALS)]
 FULL=define_asset_job('full_platform_demo',selection=AssetSelection.assets(*ASSETS),

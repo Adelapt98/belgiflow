@@ -14,4 +14,5 @@ PIPELINES = [
     ('12_warehouse_replication','Warehouse replication','Staging, idempotent replacement, Redshift COPY manifests, transactional merge'),
     ('13_operations_dashboard','Operational review','Quality-gated marts, provenance, capacity and service exceptions'),
     ('14_catalog_registration','Lake schema discovery','Explicit schema registry, Glue Data Catalog, idempotent partition registration'),
+    ('15_network_planning','Service-network scenario comparison','Configurable hubs, projected coverage, overlaps, gaps, and reproducible planning reports'),
 ]

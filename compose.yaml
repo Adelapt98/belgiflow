@@ -1,4 +1,17 @@
 services:
+  planner:
+    build: .
+    image: belgiflow:local
+    user: root
+    profiles: [ui]
+    command: [python, -m, belgiflow.planner.server, --host, 0.0.0.0, --port, "8080", --source-mode, "cached"]
+    environment:
+      PYTHONPATH: /app/src
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./data:/app/data
+      - ./src:/app/src:ro
   dagster:
     build: .
     image: belgiflow:local

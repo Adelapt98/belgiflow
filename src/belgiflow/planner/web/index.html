@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BelgiFlow | Service network planner</title>
+  <link rel="stylesheet" href="/vendor/leaflet.css"><link rel="stylesheet" href="/style.css">
+  <script defer src="/vendor/leaflet.js"></script><script defer src="/app.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/"><span class="brand-symbol">b<span>↗</span></span><strong>BelgiFlow</strong><span class="brand-divider"></span><span class="workspace-name">Network planning</span></a>
+  <nav><a class="nav-active" href="/">Planner</a><a href="http://localhost:3000" target="_blank" rel="noopener">Data pipelines ↗</a><span class="region-pill">● Belgium</span></nav>
+</header>
+<main>
+  <div class="page-heading"><div><div class="eyebrow">SERVICE NETWORK / SCENARIO COMPARISON</div><h1>Plan coverage. Compare the impact.</h1><p>Explore where a new service hub changes your network, before committing to a location.</p></div><div class="heading-actions"><button id="reset" class="button secondary">Reset example</button><div class="export-wrap"><button id="export" class="button primary" disabled>↓ Export report</button><div id="export-menu" class="export-menu" hidden><a id="csv" href="#">Comparison CSV</a><a id="json" href="#">Full analysis JSON</a></div></div></div></div>
+  <section class="metrics" aria-label="Scenario comparison results">
+    <article><div class="metric-label">Covered service area <span>PROPOSED</span></div><div class="metric-number" id="area">—</div><div class="metric-detail" id="area-change">Calculating scenario comparison</div><div class="metric-line green"></div></article>
+    <article><div class="metric-label">Buildings within coverage <span>SAMPLE</span></div><div class="metric-number" id="buildings">—</div><div class="metric-detail" id="buildings-change">Only the supplied map sample is counted</div><div class="metric-line blue"></div></article>
+    <article><div class="metric-label">Overlapping service area</div><div class="metric-number" id="overlap">—</div><div class="metric-detail" id="overlap-detail">Area served by at least two proposed hubs</div><div class="metric-line amber"></div></article>
+    <article><div class="metric-label">New area gained</div><div class="metric-number" id="gained">—</div><div class="metric-detail" id="gained-detail">Compared with the current network</div><div class="metric-line teal"></div></article>
+  </section>
+  <div class="workspace">
+    <aside class="scenario-panel">
+      <div class="panel-title"><div><h2>Network scenarios</h2><p>Define locations and service radii.</p></div><span class="small-tag">RADIUS MODEL</span></div>
+      <div class="scenario-tabs" role="tablist"><button id="tab-baseline" role="tab" aria-selected="false">Current network</button><button id="tab-proposed" class="selected" role="tab" aria-selected="true">Proposed network</button></div>
+      <label class="field-label" for="scenario-name">Scenario name</label><input id="scenario-name" maxlength="80" aria-label="Scenario name">
+      <div class="hub-heading"><h3>Service hubs <span id="hub-count"></span></h3><button id="copy-baseline" class="text-button">Copy current</button></div>
+      <div id="hub-list" class="hub-list"></div>
+      <button id="add-hub" class="add-hub">＋ Add a hub on the map</button>
+      <p id="map-hint" class="map-hint">Choose a location on the map, then adjust its service radius.</p>
+      <div id="error" class="error" role="alert" hidden></div>
+      <button id="compare" class="button primary compare-button">Compare scenarios <span>→</span></button>
+      <div class="method-note"><strong>What does coverage mean?</strong><p>A straight-line service radius, clipped to the study area and reference boundary. It does not represent driving time or predicted demand.</p></div>
+    </aside>
+    <section class="map-panel" aria-label="Coverage comparison map">
+      <div class="map-toolbar"><div><span class="live-dot"></span><strong>Brussels study area</strong><span id="source-label" class="source-label">Loading reference</span></div><div class="map-actions"><button id="fit-network" title="Fit service network">Fit network</button><button id="fit-sample" title="Zoom to sampled buildings">Inspect sample</button></div></div>
+      <div id="map" aria-label="Map of current and proposed service coverage"></div>
+      <div class="map-overlay-label">SCENARIO VIEW <span>Current + proposed</span></div>
+      <div class="legend"><span><i class="legend-blue"></i>Current coverage</span><span><i class="legend-green"></i>New coverage</span><span><i class="legend-amber"></i>Proposed overlap</span><label><input id="basemap" type="checkbox" checked>Street map</label></div>
+      <div class="map-footer"><span id="sample-note">Sampled footprints only. No customer or shipment data.</span><span>Metric calculations · EPSG:3812</span></div>
+    </section>
+  </div>
+  <section class="comparison-panel"><div class="comparison-heading"><div><h2>Decision summary</h2><p>A reproducible comparison using the same reference data and study area.</p></div><span id="status" class="status-pill">Preparing analysis</span></div><table><thead><tr><th>Planning measure</th><th id="baseline-title">Current network</th><th id="proposed-title">Proposed network</th><th>Change</th></tr></thead><tbody id="comparison-rows"></tbody></table><div class="summary-bottom"><span id="provenance"></span><span>Buildings are geographic observations, not households or demand.</span></div></section>
+  <footer class="page-footer"><span>BelgiFlow · Service-network planning for Belgium</span><span>Local-first analysis. Your scenario data stays in this workspace.</span></footer>
+</main>
+</body></html>
