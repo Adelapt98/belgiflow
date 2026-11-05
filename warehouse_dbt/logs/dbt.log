@@ -1,0 +1,780 @@
+
+
+============================== 18:43:01.973761 | ce0b370e-47d3-472c-90fb-0050f8d79247 ==============================
+[0m18:43:01.973761 [info ] [MainThread]: Running with dbt=1.12.6
+[0m18:43:01.984785 [debug] [MainThread]: running dbt with arguments {'empty': 'False', 'invocation_command': 'dbt build --project-dir C:\\Users\\Adel\\Documents\\Codex\\2026-11-01\\is-this-project-a-good-one-7\\belgiflow\\warehouse_dbt --profiles-dir C:\\Users\\Adel\\Documents\\Codex\\2026-11-01\\is-this-project-a-good-one-7\\belgiflow\\warehouse_dbt --target local', 'printer_width': '80', 'send_anonymous_usage_stats': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'quiet': 'False', 'fail_fast': 'False', 'log_format': 'default', 'indirect_selection': 'eager', 'profiles_dir': 'C:\\Users\\Adel\\Documents\\Codex\\2026-11-01\\is-this-project-a-good-one-7\\belgiflow\\warehouse_dbt', 'warn_error': 'None', 'use_colors': 'True', 'version_check': 'True', 'log_path': 'C:\\Users\\Adel\\Documents\\Codex\\2026-11-01\\is-this-project-a-good-one-7\\belgiflow\\warehouse_dbt\\logs', 'log_cache_events': 'False', 'partial_parse': 'True', 'target_path': 'None', 'static_parser': 'True', 'no_print': 'None', 'cache_selected_only': 'False', 'use_experimental_parser': 'False', 'introspect': 'True', 'maximum_seed_size_mib': '1', 'write_json': 'True', 'debug': 'False', 'hints_enabled': 'True'}
+[0m18:43:02.569298 [info ] [MainThread]: Registered adapter: duckdb=1.11.1
+[0m18:43:03.523728 [debug] [MainThread]: checksum: 95d642645778097a53070d65a36608e892f66938a212222364040faaa3c53066, vars: {}, profile: belgiflow_platform, target: local, version: 1.12.6
+[0m18:43:03.526480 [info ] [MainThread]: Unable to do partial parsing because saved manifest not found. Starting full parse.
+[0m18:43:06.427804 [debug] [MainThread]: Wrote artifact WritableManifest to C:\Users\Adel\Documents\Codex\2026-11-01\is-this-project-a-good-one-7\belgiflow\warehouse_dbt\target\manifest.json
+[0m18:43:06.434550 [debug] [MainThread]: Wrote artifact SemanticManifest to C:\Users\Adel\Documents\Codex\2026-11-01\is-this-project-a-good-one-7\belgiflow\warehouse_dbt\target\semantic_manifest.json
+[0m18:43:06.628608 [debug] [MainThread]: Wrote artifact OsiDocument to C:\Users\Adel\Documents\Codex\2026-11-01\is-this-project-a-good-one-7\belgiflow\warehouse_dbt\target\osi_document.json
+[0m18:43:06.687959 [info ] [MainThread]: Found 5 models, 10 data tests, 5 sources, 511 macros
+[0m18:43:06.692309 [info ] [MainThread]: 
+[0m18:43:06.693813 [info ] [MainThread]: Concurrency: 1 threads (target='local')
+[0m18:43:06.694797 [info ] [MainThread]: 
+[0m18:43:06.695873 [debug] [MainThread]: Acquiring new duckdb connection 'master'
+[0m18:43:06.702872 [debug] [ThreadPool]: Acquiring new duckdb connection 'list_warehouse'
+[0m18:43:07.136921 [debug] [ThreadPool]: Using duckdb connection "list_warehouse"
+[0m18:43:07.137486 [debug] [ThreadPool]: On list_warehouse: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "connection_name": "list_warehouse"} */
+
+    
+    select schema_name
+    from system.information_schema.schemata
+    
+    where lower(catalog_name) = '"warehouse"'
+    
+  
+  
+[0m18:43:07.137992 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m18:43:07.167936 [debug] [ThreadPool]: SQL status: OK in 0.030 seconds
+[0m18:43:07.169935 [debug] [ThreadPool]: On list_warehouse: Close
+[0m18:43:07.170937 [debug] [ThreadPool]: Re-using an available connection from the pool (formerly list_warehouse, now create_warehouse_main)
+[0m18:43:07.171938 [debug] [ThreadPool]: Creating schema "database: "warehouse"
+schema: "main"
+"
+[0m18:43:07.182242 [debug] [ThreadPool]: Using duckdb connection "create_warehouse_main"
+[0m18:43:07.182242 [debug] [ThreadPool]: On create_warehouse_main: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "connection_name": "create_warehouse_main"} */
+
+    
+        select type from duckdb_databases()
+        where lower(database_name)='warehouse'
+        and type != 'duckdb'
+    
+  
+[0m18:43:07.183238 [debug] [ThreadPool]: Opening a new connection, currently in state closed
+[0m18:43:07.186884 [debug] [ThreadPool]: SQL status: OK in 0.003 seconds
+[0m18:43:07.188458 [debug] [ThreadPool]: Using duckdb connection "create_warehouse_main"
+[0m18:43:07.189463 [debug] [ThreadPool]: On create_warehouse_main: BEGIN
+[0m18:43:07.190472 [debug] [ThreadPool]: SQL status: OK in 0.001 seconds
+[0m18:43:07.191471 [debug] [ThreadPool]: Using duckdb connection "create_warehouse_main"
+[0m18:43:07.192478 [debug] [ThreadPool]: On create_warehouse_main: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "connection_name": "create_warehouse_main"} */
+
+    
+    
+        create schema if not exists "warehouse"."main"
+    
+[0m18:43:07.193853 [debug] [ThreadPool]: SQL status: OK in 0.001 seconds
+[0m18:43:07.195357 [debug] [ThreadPool]: On create_warehouse_main: COMMIT
+[0m18:43:07.196371 [debug] [ThreadPool]: Using duckdb connection "create_warehouse_main"
+[0m18:43:07.196876 [debug] [ThreadPool]: On create_warehouse_main: COMMIT
+[0m18:43:07.196876 [debug] [ThreadPool]: SQL status: OK in 0.000 seconds
+[0m18:43:07.197889 [debug] [ThreadPool]: On create_warehouse_main: Close
+[0m18:43:07.199884 [debug] [ThreadPool]: Acquiring new duckdb connection 'list_warehouse_main'
+[0m18:43:07.206345 [debug] [ThreadPool]: Using duckdb connection "list_warehouse_main"
+[0m18:43:07.206851 [debug] [ThreadPool]: On list_warehouse_main: BEGIN
+[0m18:43:07.206851 [debug] [ThreadPool]: Opening a new connection, currently in state init
+[0m18:43:07.207858 [debug] [ThreadPool]: SQL status: OK in 0.001 seconds
+[0m18:43:07.208860 [debug] [ThreadPool]: Using duckdb connection "list_warehouse_main"
+[0m18:43:07.208860 [debug] [ThreadPool]: On list_warehouse_main: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "connection_name": "list_warehouse_main"} */
+select
+      'warehouse' as database,
+      table_name as name,
+      table_schema as schema,
+      CASE table_type
+        WHEN 'BASE TABLE' THEN 'table'
+        WHEN 'VIEW' THEN 'view'
+        WHEN 'LOCAL TEMPORARY' THEN 'table'
+        END as type
+    from system.information_schema.tables
+    where lower(table_schema) = 'main'
+    and lower(table_catalog) = 'warehouse'
+  
+[0m18:43:07.215358 [debug] [ThreadPool]: SQL status: OK in 0.006 seconds
+[0m18:43:07.216876 [debug] [ThreadPool]: On list_warehouse_main: ROLLBACK
+[0m18:43:07.217869 [debug] [ThreadPool]: On list_warehouse_main: Close
+[0m18:43:07.220285 [debug] [MainThread]: Using duckdb connection "master"
+[0m18:43:07.221285 [debug] [MainThread]: On master: BEGIN
+[0m18:43:07.221796 [debug] [MainThread]: Opening a new connection, currently in state init
+[0m18:43:07.223289 [debug] [MainThread]: SQL status: OK in 0.002 seconds
+[0m18:43:07.224355 [debug] [MainThread]: On master: COMMIT
+[0m18:43:07.224355 [debug] [MainThread]: Using duckdb connection "master"
+[0m18:43:07.225863 [debug] [MainThread]: On master: COMMIT
+[0m18:43:07.225863 [debug] [MainThread]: SQL status: OK in 0.000 seconds
+[0m18:43:07.226999 [debug] [MainThread]: On master: Close
+[0m18:43:07.234518 [debug] [Thread-1 (]: Began running node model.belgiflow_platform.dim_depot_history
+[0m18:43:07.236029 [info ] [Thread-1 (]: 1 of 15 START sql table model main.dim_depot_history ........................... [RUN]
+[0m18:43:07.237137 [debug] [Thread-1 (]: Acquiring new duckdb connection 'model.belgiflow_platform.dim_depot_history'
+[0m18:43:07.237642 [debug] [Thread-1 (]: Began compiling node model.belgiflow_platform.dim_depot_history
+[0m18:43:07.246165 [debug] [Thread-1 (]: Writing injected SQL for node "model.belgiflow_platform.dim_depot_history"
+[0m18:43:07.249174 [debug] [Thread-1 (]: Began executing node model.belgiflow_platform.dim_depot_history
+[0m18:43:07.251176 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.dim_depot_history"
+[0m18:43:07.251176 [debug] [Thread-1 (]: On model.belgiflow_platform.dim_depot_history: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.dim_depot_history"} */
+select database_name, type from duckdb_databases()
+[0m18:43:07.252178 [debug] [Thread-1 (]: Opening a new connection, currently in state init
+[0m18:43:07.255175 [debug] [Thread-1 (]: SQL status: OK in 0.002 seconds
+[0m18:43:07.256685 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.dim_depot_history"
+[0m18:43:07.258093 [debug] [Thread-1 (]: On model.belgiflow_platform.dim_depot_history: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.dim_depot_history"} */
+
+                    select table_name, constraint_type from duckdb_constraints()
+                    where lower(database_name) = lower('warehouse')
+                      and lower(schema_name) = lower('main')
+                      and constraint_type in ('PRIMARY KEY', 'UNIQUE', 'FOREIGN KEY')
+                    
+[0m18:43:07.265874 [debug] [Thread-1 (]: SQL status: OK in 0.007 seconds
+[0m18:43:07.483452 [debug] [Thread-1 (]: Writing runtime sql for node "model.belgiflow_platform.dim_depot_history"
+[0m18:43:07.494338 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.dim_depot_history"
+[0m18:43:07.499390 [debug] [Thread-1 (]: On model.belgiflow_platform.dim_depot_history: BEGIN
+[0m18:43:07.502407 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:07.504922 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.dim_depot_history"
+[0m18:43:07.507454 [debug] [Thread-1 (]: On model.belgiflow_platform.dim_depot_history: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.dim_depot_history"} */
+
+    
+
+    create  table
+      "warehouse"."main"."dim_depot_history__dbt_tmp"
+  
+    
+    as (
+      select entity_id,surrogate_key,cast(effective_at as timestamptz) as valid_from,
+  cast(valid_to as timestamptz) as valid_to,is_current,capacity,radius_m,deleted
+from "warehouse"."main"."depot_history"
+    );
+    
+  
+[0m18:43:07.518760 [debug] [Thread-1 (]: SQL status: OK in 0.009 seconds
+[0m18:43:07.542567 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.dim_depot_history"
+[0m18:43:07.545582 [debug] [Thread-1 (]: On model.belgiflow_platform.dim_depot_history: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.dim_depot_history"} */
+alter table "warehouse"."main"."dim_depot_history__dbt_tmp" rename to "dim_depot_history"
+[0m18:43:07.549578 [debug] [Thread-1 (]: SQL status: OK in 0.002 seconds
+[0m18:43:07.606904 [debug] [Thread-1 (]: On model.belgiflow_platform.dim_depot_history: COMMIT
+[0m18:43:07.607903 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.dim_depot_history"
+[0m18:43:07.609416 [debug] [Thread-1 (]: On model.belgiflow_platform.dim_depot_history: COMMIT
+[0m18:43:07.625775 [debug] [Thread-1 (]: SQL status: OK in 0.015 seconds
+[0m18:43:07.643448 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.dim_depot_history"
+[0m18:43:07.644630 [debug] [Thread-1 (]: On model.belgiflow_platform.dim_depot_history: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.dim_depot_history"} */
+
+      drop table if exists "warehouse"."main"."dim_depot_history__dbt_backup" cascade
+    
+[0m18:43:07.647500 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:07.659745 [debug] [Thread-1 (]: On model.belgiflow_platform.dim_depot_history: Close
+[0m18:43:07.670065 [info ] [Thread-1 (]: 1 of 15 OK created sql table model main.dim_depot_history ...................... [[32mOK[0m in 0.43s]
+[0m18:43:07.673290 [debug] [Thread-1 (]: Finished running node model.belgiflow_platform.dim_depot_history
+[0m18:43:07.674859 [debug] [Thread-1 (]: Began running node model.belgiflow_platform.fct_shipments
+[0m18:43:07.676870 [info ] [Thread-1 (]: 2 of 15 START sql incremental model main.fct_shipments ......................... [RUN]
+[0m18:43:07.678561 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.belgiflow_platform.dim_depot_history, now model.belgiflow_platform.fct_shipments)
+[0m18:43:07.679751 [debug] [Thread-1 (]: Began compiling node model.belgiflow_platform.fct_shipments
+[0m18:43:07.687415 [debug] [Thread-1 (]: Writing injected SQL for node "model.belgiflow_platform.fct_shipments"
+[0m18:43:07.691495 [debug] [Thread-1 (]: Began executing node model.belgiflow_platform.fct_shipments
+[0m18:43:07.784301 [debug] [Thread-1 (]: Writing runtime sql for node "model.belgiflow_platform.fct_shipments"
+[0m18:43:07.787195 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.fct_shipments"
+[0m18:43:07.788203 [debug] [Thread-1 (]: On model.belgiflow_platform.fct_shipments: BEGIN
+[0m18:43:07.788203 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:07.790377 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:07.790377 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.fct_shipments"
+[0m18:43:07.791689 [debug] [Thread-1 (]: On model.belgiflow_platform.fct_shipments: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.fct_shipments"} */
+
+    
+
+    create  table
+      "warehouse"."main"."fct_shipments"
+  
+    
+    as (
+      
+select shipment_id, min(depot_id) as depot_id, min(source_date) as source_date,
+  min(case when status='created' then cast(event_time as timestamptz) end) as created_at,
+  max(case when status='delivered' then cast(event_time as timestamptz) end) as delivered_at,
+  max(case when status='cancelled' then 1 else 0 end) as cancelled,
+  min(longitude) as longitude,min(latitude) as latitude
+from "warehouse"."main"."raw_events"
+
+group by shipment_id
+    );
+    
+  
+  
+[0m18:43:07.808673 [debug] [Thread-1 (]: SQL status: OK in 0.017 seconds
+[0m18:43:07.811621 [debug] [Thread-1 (]: On model.belgiflow_platform.fct_shipments: COMMIT
+[0m18:43:07.813756 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.fct_shipments"
+[0m18:43:07.814269 [debug] [Thread-1 (]: On model.belgiflow_platform.fct_shipments: COMMIT
+[0m18:43:07.818528 [debug] [Thread-1 (]: SQL status: OK in 0.004 seconds
+[0m18:43:07.820533 [debug] [Thread-1 (]: On model.belgiflow_platform.fct_shipments: Close
+[0m18:43:07.822535 [info ] [Thread-1 (]: 2 of 15 OK created sql incremental model main.fct_shipments .................... [[32mOK[0m in 0.14s]
+[0m18:43:07.824044 [debug] [Thread-1 (]: Finished running node model.belgiflow_platform.fct_shipments
+[0m18:43:07.825054 [debug] [Thread-1 (]: Began running node model.belgiflow_platform.mart_capacity
+[0m18:43:07.826052 [info ] [Thread-1 (]: 3 of 15 START sql table model main.mart_capacity ............................... [RUN]
+[0m18:43:07.827053 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.belgiflow_platform.fct_shipments, now model.belgiflow_platform.mart_capacity)
+[0m18:43:07.828230 [debug] [Thread-1 (]: Began compiling node model.belgiflow_platform.mart_capacity
+[0m18:43:07.830884 [debug] [Thread-1 (]: Writing injected SQL for node "model.belgiflow_platform.mart_capacity"
+[0m18:43:07.833273 [debug] [Thread-1 (]: Began executing node model.belgiflow_platform.mart_capacity
+[0m18:43:07.841019 [debug] [Thread-1 (]: Writing runtime sql for node "model.belgiflow_platform.mart_capacity"
+[0m18:43:07.843720 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_capacity"
+[0m18:43:07.844828 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_capacity: BEGIN
+[0m18:43:07.845338 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:07.846968 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:07.848131 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_capacity"
+[0m18:43:07.848642 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_capacity: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.mart_capacity"} */
+
+    
+
+    create  table
+      "warehouse"."main"."mart_capacity__dbt_tmp"
+  
+    
+    as (
+      select depot_id,source_date,policy_key,capacity,shipments,outside_coverage,
+  utilization,excess_shipments from "warehouse"."main"."capacity_plan"
+    );
+    
+  
+[0m18:43:07.849751 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:07.856927 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_capacity"
+[0m18:43:07.856927 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_capacity: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.mart_capacity"} */
+alter table "warehouse"."main"."mart_capacity__dbt_tmp" rename to "mart_capacity"
+[0m18:43:07.858441 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:07.862189 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_capacity: COMMIT
+[0m18:43:07.862189 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_capacity"
+[0m18:43:07.863201 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_capacity: COMMIT
+[0m18:43:07.866734 [debug] [Thread-1 (]: SQL status: OK in 0.002 seconds
+[0m18:43:07.869510 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_capacity"
+[0m18:43:07.869510 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_capacity: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.mart_capacity"} */
+
+      drop table if exists "warehouse"."main"."mart_capacity__dbt_backup" cascade
+    
+[0m18:43:07.871512 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:07.873023 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_capacity: Close
+[0m18:43:07.875619 [info ] [Thread-1 (]: 3 of 15 OK created sql table model main.mart_capacity .......................... [[32mOK[0m in 0.05s]
+[0m18:43:07.876129 [debug] [Thread-1 (]: Finished running node model.belgiflow_platform.mart_capacity
+[0m18:43:07.876129 [debug] [Thread-1 (]: Began running node model.belgiflow_platform.mart_service_coverage
+[0m18:43:07.877716 [info ] [Thread-1 (]: 4 of 15 START sql table model main.mart_service_coverage ....................... [RUN]
+[0m18:43:07.878350 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.belgiflow_platform.mart_capacity, now model.belgiflow_platform.mart_service_coverage)
+[0m18:43:07.879406 [debug] [Thread-1 (]: Began compiling node model.belgiflow_platform.mart_service_coverage
+[0m18:43:07.882406 [debug] [Thread-1 (]: Writing injected SQL for node "model.belgiflow_platform.mart_service_coverage"
+[0m18:43:07.885399 [debug] [Thread-1 (]: Began executing node model.belgiflow_platform.mart_service_coverage
+[0m18:43:07.891205 [debug] [Thread-1 (]: Writing runtime sql for node "model.belgiflow_platform.mart_service_coverage"
+[0m18:43:07.894673 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_service_coverage"
+[0m18:43:07.894673 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_service_coverage: BEGIN
+[0m18:43:07.895671 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:07.897184 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:07.898195 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_service_coverage"
+[0m18:43:07.899194 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_service_coverage: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.mart_service_coverage"} */
+
+    
+
+    create  table
+      "warehouse"."main"."mart_service_coverage__dbt_tmp"
+  
+    
+    as (
+      select source_date,depot_id,count(*) as shipments,
+  sum(case when covered then 1 else 0 end) as covered_shipments,
+  avg(distance_m) as average_straight_line_m
+from "warehouse"."main"."service_coverage" group by source_date,depot_id
+    );
+    
+  
+[0m18:43:07.912091 [debug] [Thread-1 (]: SQL status: OK in 0.012 seconds
+[0m18:43:07.915441 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_service_coverage"
+[0m18:43:07.916958 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_service_coverage: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.mart_service_coverage"} */
+alter table "warehouse"."main"."mart_service_coverage__dbt_tmp" rename to "mart_service_coverage"
+[0m18:43:07.919065 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:07.920847 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_service_coverage: COMMIT
+[0m18:43:07.922161 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_service_coverage"
+[0m18:43:07.923159 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_service_coverage: COMMIT
+[0m18:43:07.925934 [debug] [Thread-1 (]: SQL status: OK in 0.002 seconds
+[0m18:43:07.928459 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_service_coverage"
+[0m18:43:07.929968 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_service_coverage: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.mart_service_coverage"} */
+
+      drop table if exists "warehouse"."main"."mart_service_coverage__dbt_backup" cascade
+    
+[0m18:43:07.930479 [debug] [Thread-1 (]: SQL status: OK in 0.000 seconds
+[0m18:43:07.933726 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_service_coverage: Close
+[0m18:43:07.934733 [info ] [Thread-1 (]: 4 of 15 OK created sql table model main.mart_service_coverage .................. [[32mOK[0m in 0.06s]
+[0m18:43:07.935852 [debug] [Thread-1 (]: Finished running node model.belgiflow_platform.mart_service_coverage
+[0m18:43:07.936852 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.no_overlapping_history
+[0m18:43:07.938363 [info ] [Thread-1 (]: 5 of 15 START test no_overlapping_history ...................................... [RUN]
+[0m18:43:07.939818 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.belgiflow_platform.mart_service_coverage, now test.belgiflow_platform.no_overlapping_history)
+[0m18:43:07.940435 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.no_overlapping_history
+[0m18:43:07.946448 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.no_overlapping_history"
+[0m18:43:07.950425 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.no_overlapping_history
+[0m18:43:07.955501 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.no_overlapping_history"
+[0m18:43:07.956520 [debug] [Thread-1 (]: On test.belgiflow_platform.no_overlapping_history: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.no_overlapping_history"} */
+
+                    select table_name, constraint_type from duckdb_constraints()
+                    where lower(database_name) = lower('warehouse')
+                      and lower(schema_name) = lower('main_dbt_test__audit')
+                      and constraint_type in ('PRIMARY KEY', 'UNIQUE', 'FOREIGN KEY')
+                    
+[0m18:43:07.956520 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:07.960440 [debug] [Thread-1 (]: SQL status: OK in 0.003 seconds
+[0m18:43:08.006961 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.no_overlapping_history"
+[0m18:43:08.010804 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.no_overlapping_history"
+[0m18:43:08.014279 [debug] [Thread-1 (]: On test.belgiflow_platform.no_overlapping_history: BEGIN
+[0m18:43:08.016274 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.016869 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.no_overlapping_history"
+[0m18:43:08.017882 [debug] [Thread-1 (]: On test.belgiflow_platform.no_overlapping_history: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.no_overlapping_history"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  select a.entity_id from "warehouse"."main"."dim_depot_history" a
+join "warehouse"."main"."dim_depot_history" b on a.entity_id=b.entity_id
+ and a.valid_from < b.valid_from and (a.valid_to is null or a.valid_to > b.valid_from)
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.030134 [debug] [Thread-1 (]: SQL status: OK in 0.010 seconds
+[0m18:43:08.037683 [debug] [Thread-1 (]: On test.belgiflow_platform.no_overlapping_history: ROLLBACK
+[0m18:43:08.038190 [debug] [Thread-1 (]: On test.belgiflow_platform.no_overlapping_history: Close
+[0m18:43:08.039715 [info ] [Thread-1 (]: 5 of 15 PASS no_overlapping_history ............................................ [[32mPASS[0m in 0.10s]
+[0m18:43:08.041472 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.no_overlapping_history
+[0m18:43:08.043806 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4
+[0m18:43:08.044801 [info ] [Thread-1 (]: 6 of 15 START test not_null_dim_depot_history_surrogate_key .................... [RUN]
+[0m18:43:08.046809 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly test.belgiflow_platform.no_overlapping_history, now test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4)
+[0m18:43:08.048435 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4
+[0m18:43:08.079682 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4"
+[0m18:43:08.086198 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4
+[0m18:43:08.090234 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4"
+[0m18:43:08.096394 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4"
+[0m18:43:08.097413 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4: BEGIN
+[0m18:43:08.098413 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.100410 [debug] [Thread-1 (]: SQL status: OK in 0.002 seconds
+[0m18:43:08.101669 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4"
+[0m18:43:08.103194 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  
+    
+    
+
+
+
+select surrogate_key
+from "warehouse"."main"."dim_depot_history"
+where surrogate_key is null
+
+
+
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.106712 [debug] [Thread-1 (]: SQL status: OK in 0.002 seconds
+[0m18:43:08.109421 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4: ROLLBACK
+[0m18:43:08.110438 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4: Close
+[0m18:43:08.112968 [info ] [Thread-1 (]: 6 of 15 PASS not_null_dim_depot_history_surrogate_key .......................... [[32mPASS[0m in 0.07s]
+[0m18:43:08.114332 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4
+[0m18:43:08.115529 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9
+[0m18:43:08.116529 [info ] [Thread-1 (]: 7 of 15 START test unique_dim_depot_history_surrogate_key ...................... [RUN]
+[0m18:43:08.117041 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly test.belgiflow_platform.not_null_dim_depot_history_surrogate_key.f0cb6d86f4, now test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9)
+[0m18:43:08.118061 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9
+[0m18:43:08.138545 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9"
+[0m18:43:08.143083 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9
+[0m18:43:08.147488 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9"
+[0m18:43:08.150345 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9"
+[0m18:43:08.150863 [debug] [Thread-1 (]: On test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9: BEGIN
+[0m18:43:08.150863 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.153077 [debug] [Thread-1 (]: SQL status: OK in 0.002 seconds
+[0m18:43:08.154790 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9"
+[0m18:43:08.155438 [debug] [Thread-1 (]: On test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  
+    
+    
+
+select
+    surrogate_key as unique_field,
+    count(*) as n_records
+
+from "warehouse"."main"."dim_depot_history"
+where surrogate_key is not null
+group by surrogate_key
+having count(*) > 1
+
+
+
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.160330 [debug] [Thread-1 (]: SQL status: OK in 0.004 seconds
+[0m18:43:08.164916 [debug] [Thread-1 (]: On test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9: ROLLBACK
+[0m18:43:08.166642 [debug] [Thread-1 (]: On test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9: Close
+[0m18:43:08.169055 [info ] [Thread-1 (]: 7 of 15 PASS unique_dim_depot_history_surrogate_key ............................ [[32mPASS[0m in 0.05s]
+[0m18:43:08.170716 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9
+[0m18:43:08.172239 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886
+[0m18:43:08.174261 [info ] [Thread-1 (]: 8 of 15 START test not_null_fct_shipments_created_at ........................... [RUN]
+[0m18:43:08.176251 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly test.belgiflow_platform.unique_dim_depot_history_surrogate_key.8da73bd6f9, now test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886)
+[0m18:43:08.176251 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886
+[0m18:43:08.188054 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886"
+[0m18:43:08.190570 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886
+[0m18:43:08.195561 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886"
+[0m18:43:08.198322 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886"
+[0m18:43:08.199320 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886: BEGIN
+[0m18:43:08.199825 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.200831 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.202491 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886"
+[0m18:43:08.203513 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  
+    
+    
+
+
+
+select created_at
+from "warehouse"."main"."fct_shipments"
+where created_at is null
+
+
+
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.205504 [debug] [Thread-1 (]: SQL status: OK in 0.002 seconds
+[0m18:43:08.208045 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886: ROLLBACK
+[0m18:43:08.209043 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886: Close
+[0m18:43:08.210043 [info ] [Thread-1 (]: 8 of 15 PASS not_null_fct_shipments_created_at ................................. [[32mPASS[0m in 0.03s]
+[0m18:43:08.211042 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886
+[0m18:43:08.212558 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b
+[0m18:43:08.213072 [info ] [Thread-1 (]: 9 of 15 START test not_null_fct_shipments_shipment_id .......................... [RUN]
+[0m18:43:08.214268 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly test.belgiflow_platform.not_null_fct_shipments_created_at.e60f90d886, now test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b)
+[0m18:43:08.215267 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b
+[0m18:43:08.225591 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b"
+[0m18:43:08.228089 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b
+[0m18:43:08.229902 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b"
+[0m18:43:08.232514 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b"
+[0m18:43:08.233562 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b: BEGIN
+[0m18:43:08.234584 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.235577 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.235577 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b"
+[0m18:43:08.235577 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  
+    
+    
+
+
+
+select shipment_id
+from "warehouse"."main"."fct_shipments"
+where shipment_id is null
+
+
+
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.237762 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.239770 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b: ROLLBACK
+[0m18:43:08.240892 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b: Close
+[0m18:43:08.240892 [info ] [Thread-1 (]: 9 of 15 PASS not_null_fct_shipments_shipment_id ................................ [[32mPASS[0m in 0.03s]
+[0m18:43:08.241895 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b
+[0m18:43:08.243139 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c
+[0m18:43:08.244135 [info ] [Thread-1 (]: 10 of 15 START test unique_fct_shipments_shipment_id ........................... [RUN]
+[0m18:43:08.244641 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly test.belgiflow_platform.not_null_fct_shipments_shipment_id.7b472eaf5b, now test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c)
+[0m18:43:08.245646 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c
+[0m18:43:08.256268 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c"
+[0m18:43:08.258264 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c
+[0m18:43:08.260267 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c"
+[0m18:43:08.263847 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c"
+[0m18:43:08.264865 [debug] [Thread-1 (]: On test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c: BEGIN
+[0m18:43:08.265377 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.265377 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.266389 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c"
+[0m18:43:08.266389 [debug] [Thread-1 (]: On test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  
+    
+    
+
+select
+    shipment_id as unique_field,
+    count(*) as n_records
+
+from "warehouse"."main"."fct_shipments"
+where shipment_id is not null
+group by shipment_id
+having count(*) > 1
+
+
+
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.270399 [debug] [Thread-1 (]: SQL status: OK in 0.004 seconds
+[0m18:43:08.273402 [debug] [Thread-1 (]: On test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c: ROLLBACK
+[0m18:43:08.275048 [debug] [Thread-1 (]: On test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c: Close
+[0m18:43:08.276057 [info ] [Thread-1 (]: 10 of 15 PASS unique_fct_shipments_shipment_id ................................. [[32mPASS[0m in 0.03s]
+[0m18:43:08.277059 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c
+[0m18:43:08.278658 [debug] [Thread-1 (]: Began running node model.belgiflow_platform.mart_delivery_sla
+[0m18:43:08.279678 [info ] [Thread-1 (]: 11 of 15 START sql table model main.mart_delivery_sla .......................... [RUN]
+[0m18:43:08.279678 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly test.belgiflow_platform.unique_fct_shipments_shipment_id.c7c159f82c, now model.belgiflow_platform.mart_delivery_sla)
+[0m18:43:08.280714 [debug] [Thread-1 (]: Began compiling node model.belgiflow_platform.mart_delivery_sla
+[0m18:43:08.285319 [debug] [Thread-1 (]: Writing injected SQL for node "model.belgiflow_platform.mart_delivery_sla"
+[0m18:43:08.286942 [debug] [Thread-1 (]: Began executing node model.belgiflow_platform.mart_delivery_sla
+[0m18:43:08.290950 [debug] [Thread-1 (]: Writing runtime sql for node "model.belgiflow_platform.mart_delivery_sla"
+[0m18:43:08.293598 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_delivery_sla"
+[0m18:43:08.294254 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_delivery_sla: BEGIN
+[0m18:43:08.294254 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.295788 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.296802 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_delivery_sla"
+[0m18:43:08.296802 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_delivery_sla: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.mart_delivery_sla"} */
+
+    
+
+    create  table
+      "warehouse"."main"."mart_delivery_sla__dbt_tmp"
+  
+    
+    as (
+      select source_date,depot_id,count(*) as shipments,
+  sum(case when delivered_at is not null and cancelled=0 then 1 else 0 end) as delivered,
+  sum(case when cancelled=1 then 1 else 0 end) as cancelled,
+  sum(case when cancelled=0 and delivered_at >= created_at
+    and 
+        (date_diff('minute', created_at::timestamp, delivered_at::timestamp ))
+     <= 1440 then 1 else 0 end) as on_time,
+  avg(case when cancelled=0 then 
+        (date_diff('minute', created_at::timestamp, delivered_at::timestamp ))
+     end) as average_delivery_minutes
+from "warehouse"."main"."fct_shipments" group by source_date,depot_id
+    );
+    
+  
+[0m18:43:08.309657 [debug] [Thread-1 (]: SQL status: OK in 0.012 seconds
+[0m18:43:08.312965 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_delivery_sla"
+[0m18:43:08.312965 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_delivery_sla: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.mart_delivery_sla"} */
+alter table "warehouse"."main"."mart_delivery_sla__dbt_tmp" rename to "mart_delivery_sla"
+[0m18:43:08.314989 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.317510 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_delivery_sla: COMMIT
+[0m18:43:08.318503 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_delivery_sla"
+[0m18:43:08.318503 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_delivery_sla: COMMIT
+[0m18:43:08.320503 [debug] [Thread-1 (]: SQL status: OK in 0.002 seconds
+[0m18:43:08.323911 [debug] [Thread-1 (]: Using duckdb connection "model.belgiflow_platform.mart_delivery_sla"
+[0m18:43:08.323911 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_delivery_sla: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "model.belgiflow_platform.mart_delivery_sla"} */
+
+      drop table if exists "warehouse"."main"."mart_delivery_sla__dbt_backup" cascade
+    
+[0m18:43:08.325490 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.328016 [debug] [Thread-1 (]: On model.belgiflow_platform.mart_delivery_sla: Close
+[0m18:43:08.329017 [info ] [Thread-1 (]: 11 of 15 OK created sql table model main.mart_delivery_sla ..................... [[32mOK[0m in 0.05s]
+[0m18:43:08.329017 [debug] [Thread-1 (]: Finished running node model.belgiflow_platform.mart_delivery_sla
+[0m18:43:08.330421 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658
+[0m18:43:08.331422 [info ] [Thread-1 (]: 12 of 15 START test not_null_mart_delivery_sla_depot_id ........................ [RUN]
+[0m18:43:08.332426 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly model.belgiflow_platform.mart_delivery_sla, now test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658)
+[0m18:43:08.332426 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658
+[0m18:43:08.341043 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658"
+[0m18:43:08.343729 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658
+[0m18:43:08.345728 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658"
+[0m18:43:08.348607 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658"
+[0m18:43:08.348607 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658: BEGIN
+[0m18:43:08.349609 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.350615 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.350615 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658"
+[0m18:43:08.351783 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  
+    
+    
+
+
+
+select depot_id
+from "warehouse"."main"."mart_delivery_sla"
+where depot_id is null
+
+
+
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.354334 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.356509 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658: ROLLBACK
+[0m18:43:08.357547 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658: Close
+[0m18:43:08.359038 [info ] [Thread-1 (]: 12 of 15 PASS not_null_mart_delivery_sla_depot_id .............................. [[32mPASS[0m in 0.03s]
+[0m18:43:08.360037 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658
+[0m18:43:08.360037 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d
+[0m18:43:08.361036 [info ] [Thread-1 (]: 13 of 15 START test not_null_mart_delivery_sla_source_date ..................... [RUN]
+[0m18:43:08.361036 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly test.belgiflow_platform.not_null_mart_delivery_sla_depot_id.d654c87658, now test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d)
+[0m18:43:08.362040 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d
+[0m18:43:08.370612 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d"
+[0m18:43:08.372227 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d
+[0m18:43:08.375442 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d"
+[0m18:43:08.376921 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d"
+[0m18:43:08.378429 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d: BEGIN
+[0m18:43:08.378429 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.379440 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.379440 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d"
+[0m18:43:08.380436 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  
+    
+    
+
+
+
+select source_date
+from "warehouse"."main"."mart_delivery_sla"
+where source_date is null
+
+
+
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.381436 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.384784 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d: ROLLBACK
+[0m18:43:08.386430 [debug] [Thread-1 (]: On test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d: Close
+[0m18:43:08.386430 [info ] [Thread-1 (]: 13 of 15 PASS not_null_mart_delivery_sla_source_date ........................... [[32mPASS[0m in 0.03s]
+[0m18:43:08.387450 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d
+[0m18:43:08.387450 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.reconcile_shipments
+[0m18:43:08.388960 [info ] [Thread-1 (]: 14 of 15 START test reconcile_shipments ........................................ [RUN]
+[0m18:43:08.389976 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly test.belgiflow_platform.not_null_mart_delivery_sla_source_date.067726246d, now test.belgiflow_platform.reconcile_shipments)
+[0m18:43:08.389976 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.reconcile_shipments
+[0m18:43:08.393616 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.reconcile_shipments"
+[0m18:43:08.395128 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.reconcile_shipments
+[0m18:43:08.398138 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.reconcile_shipments"
+[0m18:43:08.400664 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.reconcile_shipments"
+[0m18:43:08.400664 [debug] [Thread-1 (]: On test.belgiflow_platform.reconcile_shipments: BEGIN
+[0m18:43:08.401924 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.403713 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.403713 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.reconcile_shipments"
+[0m18:43:08.404715 [debug] [Thread-1 (]: On test.belgiflow_platform.reconcile_shipments: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.reconcile_shipments"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  select 1 as failure where
+ (select sum(shipments) from "warehouse"."main"."mart_delivery_sla") <>
+ (select count(distinct shipment_id) from "warehouse"."main"."raw_events")
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.418886 [debug] [Thread-1 (]: SQL status: OK in 0.014 seconds
+[0m18:43:08.422408 [debug] [Thread-1 (]: On test.belgiflow_platform.reconcile_shipments: ROLLBACK
+[0m18:43:08.423640 [debug] [Thread-1 (]: On test.belgiflow_platform.reconcile_shipments: Close
+[0m18:43:08.424678 [info ] [Thread-1 (]: 14 of 15 PASS reconcile_shipments .............................................. [[32mPASS[0m in 0.04s]
+[0m18:43:08.424678 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.reconcile_shipments
+[0m18:43:08.425900 [debug] [Thread-1 (]: Began running node test.belgiflow_platform.valid_delivery_counts
+[0m18:43:08.425900 [info ] [Thread-1 (]: 15 of 15 START test valid_delivery_counts ...................................... [RUN]
+[0m18:43:08.426904 [debug] [Thread-1 (]: Re-using an available connection from the pool (formerly test.belgiflow_platform.reconcile_shipments, now test.belgiflow_platform.valid_delivery_counts)
+[0m18:43:08.426904 [debug] [Thread-1 (]: Began compiling node test.belgiflow_platform.valid_delivery_counts
+[0m18:43:08.428903 [debug] [Thread-1 (]: Writing injected SQL for node "test.belgiflow_platform.valid_delivery_counts"
+[0m18:43:08.431530 [debug] [Thread-1 (]: Began executing node test.belgiflow_platform.valid_delivery_counts
+[0m18:43:08.435067 [debug] [Thread-1 (]: Writing runtime sql for node "test.belgiflow_platform.valid_delivery_counts"
+[0m18:43:08.437081 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.valid_delivery_counts"
+[0m18:43:08.438081 [debug] [Thread-1 (]: On test.belgiflow_platform.valid_delivery_counts: BEGIN
+[0m18:43:08.438081 [debug] [Thread-1 (]: Opening a new connection, currently in state closed
+[0m18:43:08.439082 [debug] [Thread-1 (]: SQL status: OK in 0.001 seconds
+[0m18:43:08.439082 [debug] [Thread-1 (]: Using duckdb connection "test.belgiflow_platform.valid_delivery_counts"
+[0m18:43:08.440076 [debug] [Thread-1 (]: On test.belgiflow_platform.valid_delivery_counts: /* {"app": "dbt", "dbt_version": "1.12.6", "profile_name": "belgiflow_platform", "target_name": "local", "node_id": "test.belgiflow_platform.valid_delivery_counts"} */
+
+    
+    select
+      count(*) as failures,
+      count(*) != 0 as should_warn,
+      count(*) != 0 as should_error
+    from (
+      
+    
+  select * from "warehouse"."main"."mart_delivery_sla"
+where shipments < delivered + cancelled or delivered < on_time or on_time < 0
+  
+  
+      
+    ) dbt_internal_test
+[0m18:43:08.445117 [debug] [Thread-1 (]: SQL status: OK in 0.005 seconds
+[0m18:43:08.447114 [debug] [Thread-1 (]: On test.belgiflow_platform.valid_delivery_counts: ROLLBACK
+[0m18:43:08.448984 [debug] [Thread-1 (]: On test.belgiflow_platform.valid_delivery_counts: Close
+[0m18:43:08.448984 [info ] [Thread-1 (]: 15 of 15 PASS valid_delivery_counts ............................................ [[32mPASS[0m in 0.02s]
+[0m18:43:08.449989 [debug] [Thread-1 (]: Finished running node test.belgiflow_platform.valid_delivery_counts
+[0m18:43:08.451503 [debug] [MainThread]: Using duckdb connection "master"
+[0m18:43:08.452935 [debug] [MainThread]: On master: BEGIN
+[0m18:43:08.452935 [debug] [MainThread]: Opening a new connection, currently in state closed
+[0m18:43:08.454595 [debug] [MainThread]: SQL status: OK in 0.001 seconds
+[0m18:43:08.454595 [debug] [MainThread]: On master: COMMIT
+[0m18:43:08.454595 [debug] [MainThread]: Using duckdb connection "master"
+[0m18:43:08.456103 [debug] [MainThread]: On master: COMMIT
+[0m18:43:08.456103 [debug] [MainThread]: SQL status: OK in 0.000 seconds
+[0m18:43:08.457149 [debug] [MainThread]: On master: Close
+[0m18:43:08.457149 [debug] [MainThread]: Connection 'master' was properly closed.
+[0m18:43:08.457149 [debug] [MainThread]: Connection 'create_warehouse_main' was properly closed.
+[0m18:43:08.458933 [debug] [MainThread]: Connection 'list_warehouse_main' was properly closed.
+[0m18:43:08.458933 [debug] [MainThread]: Connection 'test.belgiflow_platform.valid_delivery_counts' was properly closed.
+[0m18:43:08.458933 [info ] [MainThread]: 
+[0m18:43:08.459944 [info ] [MainThread]: Finished running 1 incremental model, 4 table models, 10 data tests in 0 hours 0 minutes and 1.76 seconds (1.76s).
+[0m18:43:08.463471 [debug] [MainThread]: Command end result
+[0m18:43:08.520730 [debug] [MainThread]: Wrote artifact WritableManifest to C:\Users\Adel\Documents\Codex\2026-11-01\is-this-project-a-good-one-7\belgiflow\warehouse_dbt\target\manifest.json
+[0m18:43:08.530000 [debug] [MainThread]: Wrote artifact SemanticManifest to C:\Users\Adel\Documents\Codex\2026-11-01\is-this-project-a-good-one-7\belgiflow\warehouse_dbt\target\semantic_manifest.json
+[0m18:43:08.536742 [debug] [MainThread]: Wrote artifact OsiDocument to C:\Users\Adel\Documents\Codex\2026-11-01\is-this-project-a-good-one-7\belgiflow\warehouse_dbt\target\osi_document.json
+[0m18:43:08.548791 [debug] [MainThread]: Wrote artifact RunExecutionResult to C:\Users\Adel\Documents\Codex\2026-11-01\is-this-project-a-good-one-7\belgiflow\warehouse_dbt\target\run_results.json
+[0m18:43:08.549809 [info ] [MainThread]: 
+[0m18:43:08.549809 [info ] [MainThread]: [32mCompleted successfully[0m
+[0m18:43:08.550800 [info ] [MainThread]: 
+[0m18:43:08.550800 [info ] [MainThread]: Done. PASS=15 WARN=0 ERROR=0 SKIP=0 NO-OP=0 REUSED=0 TOTAL=15
+[0m18:43:08.555744 [debug] [MainThread]: Command `dbt build` succeeded at 18:43:08.555744 after 7.38 seconds
+[0m18:43:08.555744 [debug] [MainThread]: Flushing usage events

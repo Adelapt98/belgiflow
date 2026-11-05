@@ -1,0 +1,9 @@
+name: belgiflow_platform
+version: '2.0'
+config-version: 2
+profile: belgiflow_platform
+model-paths: [models]
+test-paths: [tests]
+models:
+  belgiflow_platform:
+    +materialized: table

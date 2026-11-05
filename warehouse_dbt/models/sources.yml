@@ -1,0 +1,27 @@
+version: 2
+sources:
+  - name: operations
+    schema: "{{ target.schema }}"
+    tables:
+      - name: raw_events
+      - name: source_changed_shipments
+      - name: service_coverage
+      - name: capacity_plan
+      - name: depot_history
+models:
+  - name: fct_shipments
+    columns:
+      - name: shipment_id
+        tests: [unique, not_null]
+      - name: created_at
+        tests: [not_null]
+  - name: mart_delivery_sla
+    columns:
+      - name: depot_id
+        tests: [not_null]
+      - name: source_date
+        tests: [not_null]
+  - name: dim_depot_history
+    columns:
+      - name: surrogate_key
+        tests: [unique, not_null]
