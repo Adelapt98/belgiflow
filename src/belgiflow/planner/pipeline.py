@@ -8,8 +8,12 @@ from .server import csv_report
 
 def planning_product(store):
     path = os.getenv('BELGIFLOW_PLANNING_CONFIG')
-    request = json.loads(Path(path).read_text(encoding='utf-8')) if path else EXAMPLE
-    result = CoverageEngine.from_store(store).compare(request)
+    payload = json.loads(Path(path).read_text(encoding='utf-8')) if path else EXAMPLE
+    request = payload.get('request', payload)
+    engine = CoverageEngine.from_store(store)
+    if payload.get('source_id') and payload['source_id'] != engine.source_id:
+        raise ValueError('Saved analysis uses a different geographic reference. Use its raw request explicitly to evaluate a new reference.')
+    result = engine.compare(request)
     store.json('network_plan', result)
     store.path('network_plan', 'csv').write_bytes(csv_report(result))
     return dict(plan_id=result['plan_id'], baseline_km2=result['baseline']['metrics']['covered_area_km2'],

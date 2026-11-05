@@ -164,6 +164,11 @@ async function compare(fit = false) {
     number('gained', result.changes.added_area_km2, 'km²');
     $('area-change').textContent = signed(result.changes.net_area_km2, 'km²') + ' net change from current';
     $('buildings-change').textContent = signed(result.changes.additional_buildings) + ' sampled building locations covered';
+    $('sample-note').textContent = `${result.proposed.metrics.sampled_buildings} of ${bootstrap.total_buildings} sampled footprints in study area · ${bootstrap.provenance.release}`;
+    if (!result.proposed.metrics.sampled_buildings) {
+      $('buildings').textContent = 'No sample';
+      $('buildings-change').textContent = 'Area metrics available. No buildings sampled here.';
+    }
     $('gained-detail').textContent = fmt(result.changes.lost_area_km2) + ' km² of current coverage lost';
     $('provenance').textContent = `${result.provenance.mode} · ${result.provenance.release} · comparison ${result.plan_id.slice(0, 8)}`;
     $('status').textContent = 'Comparison up to date';
@@ -179,11 +184,17 @@ async function compare(fit = false) {
 for (const key of ['baseline', 'proposed']) $(`tab-${key}`).addEventListener('click', () => {active = key; renderHubs();});
 $('scenario-name').addEventListener('change', () => {plan[active].name = $('scenario-name').value; dirty();});
 $('compare').addEventListener('click', () => compare());
-$('reset').addEventListener('click', () => {plan = clone(bootstrap.example); active = 'proposed'; renderHubs(); compare(true);});
+$('reset').addEventListener('click', () => {plan = clone(bootstrap.example); active = 'proposed'; $('study-label').textContent = 'Brussels study area'; renderHubs(); compare(true);});
 $('copy-baseline').addEventListener('click', () => {plan.proposed.hubs = clone(plan.baseline.hubs); active = 'proposed'; renderHubs(); dirty();});
 $('export').addEventListener('click', () => $('export-menu').hidden = !$('export-menu').hidden);
 $('basemap').addEventListener('change', event => event.target.checked ? tiles.addTo(map) : map.removeLayer(tiles));
 $('fit-network').addEventListener('click', fitNetwork);
+$('use-map-extent').addEventListener('click', () => {
+  const bounds = map.getBounds();
+  plan.study_area = [Math.max(2.4, bounds.getWest()), Math.max(49.4, bounds.getSouth()), Math.min(6.5, bounds.getEast()), Math.min(51.6, bounds.getNorth())];
+  $('study-label').textContent = 'Selected study area';
+  compare();
+});
 $('fit-sample').addEventListener('click', () => map.fitBounds(L.geoJSON(bootstrap.building_sample_extent).getBounds(), {padding: [80, 80], maxZoom: 18}));
 $('add-hub').addEventListener('click', () => {
   adding = !adding;
