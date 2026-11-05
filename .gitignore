@@ -6,6 +6,9 @@
 __pycache__/
 .pytest_cache/
 .env
+.env.*
+!.env.example
+dbt/.user.yml
 data/
 *.duckdb
 *.duckdb.wal

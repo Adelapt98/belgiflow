@@ -4,6 +4,8 @@ import re
 from pathlib import Path
 import requests
 import duckdb
+import hashlib
+import threading
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urljoin
 from requests.adapters import HTTPAdapter
@@ -117,6 +119,12 @@ def download(release, feature, bbox, output):
         raise ValueError('download must stay within Belgium acquisition envelope')
     output = Path(output)
     output.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path=output.with_suffix('.manifest.json')
+    if output.exists() and manifest_path.exists():
+        manifest=json.loads(manifest_path.read_text(encoding='utf-8'))
+        if (manifest.get('release'),manifest.get('feature'),manifest.get('bbox')) == (release,feature,list(bbox)):
+            if manifest.get('sha256')==_checksum(output):
+                return manifest
     pending = output.with_suffix('.pending.parquet')
     source = source_files(release, feature, bbox)
     con = duckdb.connect()
@@ -133,13 +141,29 @@ def download(release, feature, bbox, output):
         con.execute('SET enable_progress_bar=false')
         query = '''SELECT id, geometry, bbox FROM read_parquet(?)
           WHERE bbox.xmin <= ? AND bbox.xmax >= ? AND bbox.ymin <= ? AND bbox.ymax >= ?'''
-        table = con.execute(query, [source, east, west, north, south]).to_arrow_table()
         import pyarrow.parquet as pq
-        pq.write_table(table, pending)
+        timer=threading.Timer(300,con.interrupt)
+        timer.start()
+        try:
+            reader=con.execute(query, [source, east, west, north, south]).to_arrow_reader(65536)
+            rows=0
+            with pq.ParquetWriter(pending,reader.schema) as writer:
+                for batch in reader:
+                    writer.write_batch(batch)
+                    rows+=batch.num_rows
+        finally:
+            timer.cancel()
         pending.replace(output)
-        manifest = dict(release=release, feature=feature, bbox=list(bbox), rows=table.num_rows,
-                        bytes=output.stat().st_size, exact_country_filter=False)
-        output.with_suffix('.manifest.json').write_text(json.dumps(manifest, indent=2), encoding='utf-8')
+        manifest = dict(release=release, feature=feature, bbox=list(bbox), rows=rows,
+                        bytes=output.stat().st_size,sha256=_checksum(output), exact_country_filter=False)
+        temporary_manifest=manifest_path.with_suffix('.tmp')
+        temporary_manifest.write_text(json.dumps(manifest,indent=2),encoding='utf-8')
+        temporary_manifest.replace(manifest_path)
         return manifest
     finally:
         con.close()
+
+
+def _checksum(path):
+    with Path(path).open('rb') as handle:
+        return hashlib.file_digest(handle,'sha256').hexdigest()

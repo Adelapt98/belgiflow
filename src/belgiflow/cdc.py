@@ -6,8 +6,9 @@ import sqlite3
 
 def initialize(dsn):
     import psycopg
+    from importlib.resources import files
     with psycopg.connect(dsn) as con:
-        con.execute((Path(__file__).resolve().parents[2] / 'sql/operational.sql').read_text())
+        con.execute(files('belgiflow').joinpath('resources/operational.sql').read_text())
 
 
 def consume(dsn, journal, consumer='belgiflow', limit=1000, fail_before_ack=False):

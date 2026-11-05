@@ -78,7 +78,7 @@ resource "aws_ecs_cluster" "batch" {
 resource "aws_iam_role" "task" {
   name = "belgiflow-task"
   assume_role_policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [{ Effect = "Allow", Action = "sts:AssumeRole", Principal = { Service = "ecs-tasks.amazonaws.com" } }]
   })
 }
@@ -93,7 +93,7 @@ resource "aws_iam_role_policy_attachment" "execution" {
 resource "aws_iam_role_policy" "publication" {
   role = aws_iam_role.task.id
   policy = jsonencode({
-    Version = "2012-10-17"
+    Version   = "2012-10-17"
     Statement = [{ Effect = "Allow", Action = ["s3:PutObject"], Resource = "${aws_s3_bucket.lake.arn}/belgiflow/*" }]
   })
 }
@@ -103,10 +103,10 @@ resource "aws_ecs_task_definition" "batch" {
   network_mode             = "awsvpc"
   cpu                      = "1024"
   memory                   = "2048"
-  execution_role_arn        = aws_iam_role.execution.arn
-  task_role_arn             = aws_iam_role.task.arn
+  execution_role_arn       = aws_iam_role.execution.arn
+  task_role_arn            = aws_iam_role.task.arn
   container_definitions = jsonencode([{
-    name = "batch", image = var.container_image, essential = true
+    name        = "batch", image = var.container_image, essential = true
     environment = [{ name = "BELGIFLOW_BUCKET", value = aws_s3_bucket.lake.id }]
     logConfiguration = {
       logDriver = "awslogs"

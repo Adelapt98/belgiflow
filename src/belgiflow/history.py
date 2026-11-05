@@ -1,10 +1,16 @@
 """Rebuild effective-time history from durable, replayable changes."""
 from hashlib import sha256
+from datetime import datetime,timezone
 
 
 def scd2(changes):
     versions = {}
     for change in changes:
+        change=dict(change)
+        effective=datetime.fromisoformat(change['effective_at'])
+        if effective.tzinfo is None:
+            raise ValueError('effective timestamp must have a timezone')
+        change['effective_at']=effective.astimezone(timezone.utc).isoformat()
         key = (change['entity_id'], change['effective_at'])
         previous = versions.get(key)
         if previous is None or change['revision'] > previous['revision']:

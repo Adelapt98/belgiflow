@@ -15,7 +15,7 @@ def marts(events):
           from events group by shipment_id""")
         cursor = con.execute("""select depot_id, count(*) shipments,
           count(*) filter(where delivered_at is not null and not cancelled) delivered,
-          count(*) filter(where not cancelled and delivered_at <= created_at + interval '24 hours') on_time
+          count(*) filter(where not cancelled and delivered_at between created_at and created_at + interval '24 hours') on_time
           from shipments group by depot_id order by depot_id""")
         names = [c[0] for c in cursor.description]
         return [dict(zip(names, row)) for row in cursor.fetchall()]
