@@ -105,6 +105,17 @@ def warehouse_replication(context,platform: Platform):
                      database=os.getenv('BELGIFLOW_REDSHIFT_DATABASE','belgiflow'),
                      role_arn=os.getenv('BELGIFLOW_REDSHIFT_COPY_ROLE'))
 
+@asset(group_name='lake_delivery',deps=[lake_publication],description='Register an immutable event partition in the local schema registry or AWS Glue Catalog.',**COMMON)
+def catalog_registration(context,platform: Platform):
+    from .platform.cloud import register_catalog
+    return register_catalog(platform.store(context),database=os.getenv('BELGIFLOW_GLUE_DATABASE'),
+                            bucket=os.getenv('BELGIFLOW_BUCKET') if platform.backend=='aws' else None)
+
+@asset(group_name='warehouse_delivery',deps=[warehouse_replication],description='Execute and test the same dbt models on the serving warehouse, including Redshift with temporary IAM credentials.',**COMMON)
+def serving_models(context,platform: Platform):
+    from .platform.warehouse import build_marts
+    return build_marts(platform.store(context),target='redshift' if platform.backend=='aws' else 'serving')
+
 @asset(group_name='operational_review',deps=[observability],description='Quality-gated business dashboard and educational pipeline catalog.',**COMMON)
 def operations_dashboard(context,platform: Platform):
     from .platform.dashboard import render
@@ -114,10 +125,10 @@ def operations_dashboard(context,platform: Platform):
 
 ASSETS=[geographic_reference,map_features,shipment_source,accepted_events,reference_changes,depot_history,
         service_coverage,capacity_plan,warehouse_inputs,delivery_sla,building_accessibility,map_change_audit,
-        spark_compaction,quality_report,observability,lake_publication,warehouse_replication,operations_dashboard]
+        spark_compaction,quality_report,observability,lake_publication,warehouse_replication,operations_dashboard,catalog_registration,serving_models]
 TERMINALS=[map_features,accepted_events,depot_history,service_coverage,delivery_sla,capacity_plan,
            building_accessibility,map_change_audit,spark_compaction,observability,
-           lake_publication,warehouse_replication,operations_dashboard]
+           lake_publication,serving_models,operations_dashboard,catalog_registration]
 JOBS=[define_asset_job(name,selection=AssetSelection.assets(terminal).upstream(),description=purpose+'. '+concepts)
       for (name,purpose,concepts),terminal in zip(PIPELINES,TERMINALS)]
 FULL=define_asset_job('full_platform_demo',selection=AssetSelection.assets(*ASSETS),

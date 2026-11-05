@@ -72,6 +72,10 @@ variable "container_image" {
   type        = string
   description = "Immutable ECR image URI or digest to execute after pushing the application image."
 }
+variable "run_partition" {
+  type    = string
+  default = "2026-01-03"
+}
 resource "aws_ecs_cluster" "batch" {
   name = "belgiflow"
 }
@@ -106,8 +110,20 @@ resource "aws_ecs_task_definition" "batch" {
   execution_role_arn       = aws_iam_role.execution.arn
   task_role_arn            = aws_iam_role.task.arn
   container_definitions = jsonencode([{
-    name        = "batch", image = var.container_image, essential = true
-    environment = [{ name = "BELGIFLOW_BUCKET", value = aws_s3_bucket.lake.id }]
+    name    = "batch", image = var.container_image, essential = true
+    command = ["python", "-m", "belgiflow.platform.cli", "run", "--pipeline", var.enable_analytics ? "full_platform_demo" : "13_operations_dashboard", "--date", var.run_partition, "--source-mode", "fixtures"]
+    environment = concat([
+      { name = "BELGIFLOW_BUCKET", value = aws_s3_bucket.lake.id },
+      { name = "BELGIFLOW_BACKEND", value = var.enable_analytics ? "aws" : "local" },
+      { name = "BELGIFLOW_SOURCE_MODE", value = "fixtures" },
+      { name = "DBT_SEND_ANONYMOUS_USAGE_STATS", value = "false" }
+      ], var.enable_analytics ? [
+      { name = "BELGIFLOW_REDSHIFT_WORKGROUP", value = aws_redshiftserverless_workgroup.analytics[0].workgroup_name },
+      { name = "BELGIFLOW_REDSHIFT_DATABASE", value = "belgiflow" },
+      { name = "BELGIFLOW_REDSHIFT_COPY_ROLE", value = aws_iam_role.redshift_copy[0].arn },
+      { name = "BELGIFLOW_GLUE_JOB", value = aws_glue_job.compaction[0].name },
+      { name = "BELGIFLOW_GLUE_DATABASE", value = aws_glue_catalog_database.analytics[0].name }
+    ] : [])
     logConfiguration = {
       logDriver = "awslogs"
       options = {

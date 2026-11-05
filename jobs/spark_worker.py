@@ -12,10 +12,16 @@ QUEUE.mkdir(parents=True,exist_ok=True)
 
 def confined(value):
     path=(DATA/value).resolve()
-    if not path.is_relative_to(DATA):
+    try:
+        path.relative_to(DATA)
+    except ValueError:
         raise ValueError('Spark path escaped the shared data directory')
     return path
 
+
+# A stopped container cannot retain a live Spark child. Requeue its interrupted claims.
+for stale in QUEUE.glob('*.request.running'):
+    stale.rename(stale.with_suffix('.json'))
 
 while True:
     for request in sorted(QUEUE.glob('*.request.json')):
@@ -24,7 +30,7 @@ while True:
             request.rename(claimed)
         except FileNotFoundError:
             continue
-        identity=request.name.removesuffix('.request.json')
+        identity=request.name[:-len('.request.json')]
         result_path=QUEUE/(identity+'.result.json')
         try:
             message=json.loads(claimed.read_text())

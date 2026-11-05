@@ -13,4 +13,5 @@ PIPELINES = [
     ('11_lake_publication','Versioned data-product delivery','Immutable objects, manifests, atomic completion pointer, local store or S3'),
     ('12_warehouse_replication','Warehouse replication','Staging, idempotent replacement, Redshift COPY manifests, transactional merge'),
     ('13_operations_dashboard','Operational review','Quality-gated marts, provenance, capacity and service exceptions'),
+    ('14_catalog_registration','Lake schema discovery','Explicit schema registry, Glue Data Catalog, idempotent partition registration'),
 ]

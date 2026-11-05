@@ -6,6 +6,11 @@ belgiflow_platform:
       path: "{{ env_var('BELGIFLOW_WAREHOUSE', 'data/platform/warehouse.duckdb') }}"
       schema: main
       threads: 1
+    serving:
+      type: duckdb
+      path: "{{ env_var('BELGIFLOW_SERVING_DATABASE', 'data/platform/serving.duckdb') }}"
+      schema: analytics
+      threads: 1
     redshift:
       type: redshift
       host: "{{ env_var('BELGIFLOW_REDSHIFT_HOST', 'not-configured.redshift-serverless.amazonaws.com') }}"

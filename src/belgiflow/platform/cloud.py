@@ -18,7 +18,7 @@ TABLES = {
     'daily_delivery_sla': ('delivery_sla', ['source_date','depot_id','shipments','delivered','cancelled','on_time','average_delivery_minutes'], ['source_date','depot_id']),
     'source_changed_shipments': ('accepted_events', ['shipment_id'], ['shipment_id']),
 }
-INTEGERS = {'revision','capacity','shipments','outside_coverage','excess_shipments','delivered','cancelled','on_time'}
+INTEGERS = {'revision','capacity','radius_m','shipments','outside_coverage','excess_shipments','delivered','cancelled','on_time'}
 DOUBLES = {'longitude','latitude','distance_m','utilization','average_delivery_minutes'}
 BOOLEANS = {'deleted','is_current','covered'}
 

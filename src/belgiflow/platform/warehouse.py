@@ -12,6 +12,16 @@ def build_marts(store, target='local'):
                        DBT_SEND_ANONYMOUS_USAGE_STATS='false',
                        DBT_TARGET_PATH=str((store.directory/'dbt_target').resolve()),
                        DBT_LOG_PATH=str((store.directory/'dbt_logs').resolve()))
+    environment['BELGIFLOW_SERVING_DATABASE']=str((store.root/'serving.duckdb').resolve())
+    if target=='redshift':
+        import boto3
+        workgroup=os.environ['BELGIFLOW_REDSHIFT_WORKGROUP']
+        client=boto3.client('redshift-serverless')
+        credentials=client.get_credentials(workgroupName=workgroup,
+                                           dbName=os.getenv('BELGIFLOW_REDSHIFT_DATABASE','belgiflow'))
+        host=client.get_workgroup(workgroupName=workgroup)['workgroup']['endpoint']['address']
+        environment.update(BELGIFLOW_REDSHIFT_USER=credentials['dbUser'],
+                           BELGIFLOW_REDSHIFT_PASSWORD=credentials['dbPassword'],BELGIFLOW_REDSHIFT_HOST=host)
     project = Path(os.environ.get('BELGIFLOW_DBT_PROJECT','warehouse_dbt')).resolve()
     result = subprocess.run([executable,'build','--project-dir',str(project),'--profiles-dir',str(project),'--target',target],
                             env=environment,capture_output=True,text=True,timeout=300)
@@ -29,4 +39,4 @@ def build_marts(store, target='local'):
         finally:
             con.close()
         return store.write('delivery_sla',rows,dict(engine='dbt-duckdb',incremental='affected shipment IDs'))
-    return store.json('redshift_dbt_run',dict(target='redshift',status='completed'))
+    return store.json('serving_dbt_run',dict(target=target,status='completed'))
