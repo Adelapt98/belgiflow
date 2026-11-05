@@ -17,10 +17,12 @@ Verified locally on 5 November 2026. Results describe the executed workloads, no
 | Belgian polygon | Retrieved national land boundary, bounding coordinates approximately 2.5455, 49.4970, 6.4081, 51.5051 |
 | Source filtering | Live sample geometries clipped against the national polygon |
 | Terraform | Initialized and validated locally, no AWS resources created |
+| Docker | Locked-runtime image built, synthetic demo executed successfully, packaged SQL resource verified |
 
 The first broad source scan was stopped. STAC item filtering was then implemented and the small downloads succeeded. DuckDB's spatial extension was blocked by Windows application policy, so the working implementation uses Shapely and pyproj for geometry operations and needs only httpfs for remote Parquet.
 
 The dashboard is generated HTML with offline SVG and an interactive depot filter. Its content is covered by an integration test. Cross-browser visual testing has not been performed.
 
 National ingestion, distributed spatial joins, production CDC retention, S3 uploads, and actual Fargate execution have not been validated. The GitHub workflow has not run on GitHub. Do not present those capabilities as demonstrated deployments.
+
 
