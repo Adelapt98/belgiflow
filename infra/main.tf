@@ -67,3 +67,55 @@ resource "aws_cloudwatch_log_group" "batch" {
 }
 output "lake_bucket" { value = aws_s3_bucket.lake.id }
 output "repository" { value = aws_ecr_repository.batch.repository_url }
+
+variable "container_image" {
+  type        = string
+  description = "Immutable ECR image URI or digest to execute after pushing the application image."
+}
+resource "aws_ecs_cluster" "batch" {
+  name = "belgiflow"
+}
+resource "aws_iam_role" "task" {
+  name = "belgiflow-task"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{ Effect = "Allow", Action = "sts:AssumeRole", Principal = { Service = "ecs-tasks.amazonaws.com" } }]
+  })
+}
+resource "aws_iam_role" "execution" {
+  name               = "belgiflow-execution"
+  assume_role_policy = aws_iam_role.task.assume_role_policy
+}
+resource "aws_iam_role_policy_attachment" "execution" {
+  role       = aws_iam_role.execution.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+}
+resource "aws_iam_role_policy" "publication" {
+  role = aws_iam_role.task.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{ Effect = "Allow", Action = ["s3:PutObject"], Resource = "${aws_s3_bucket.lake.arn}/belgiflow/*" }]
+  })
+}
+resource "aws_ecs_task_definition" "batch" {
+  family                   = "belgiflow-batch"
+  requires_compatibilities = ["FARGATE"]
+  network_mode             = "awsvpc"
+  cpu                      = "1024"
+  memory                   = "2048"
+  execution_role_arn        = aws_iam_role.execution.arn
+  task_role_arn             = aws_iam_role.task.arn
+  container_definitions = jsonencode([{
+    name = "batch", image = var.container_image, essential = true
+    environment = [{ name = "BELGIFLOW_BUCKET", value = aws_s3_bucket.lake.id }]
+    logConfiguration = {
+      logDriver = "awslogs"
+      options = {
+        "awslogs-group"         = aws_cloudwatch_log_group.batch.name
+        "awslogs-region"        = var.region
+        "awslogs-stream-prefix" = "batch"
+      }
+    }
+  }])
+}
+output "task_definition" { value = aws_ecs_task_definition.batch.arn }

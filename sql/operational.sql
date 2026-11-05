@@ -11,6 +11,7 @@ CREATE TABLE IF NOT EXISTS outbox (
   payload jsonb NOT NULL,
   observed_at timestamptz NOT NULL DEFAULT clock_timestamp()
 );
+ALTER TABLE depot ADD COLUMN IF NOT EXISTS radius_m integer NOT NULL DEFAULT 1000;
 CREATE TABLE IF NOT EXISTS delivery_ack (
   consumer text NOT NULL,
   change_id bigint NOT NULL REFERENCES outbox(change_id),

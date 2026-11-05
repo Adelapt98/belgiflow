@@ -30,6 +30,10 @@ def main():
         from .dashboard import render
         result=run(shipments=args.shipments)
         print(json.dumps(dict(events=result['events'],coverage=result['coverage'],dashboard=str(render())),indent=2))
+        import os
+        if os.getenv('BELGIFLOW_BUCKET'):
+            from .cloud import upload
+            upload('data/dashboard',os.environ['BELGIFLOW_BUCKET'])
         return
     events, rejected = normalize(generate(args.shipments))
     if rejected:

@@ -11,6 +11,7 @@ orchestration = ["dagster>=1.11,<2", "dagster-webserver>=1.11,<2"]
 analytics = ["dbt-duckdb>=1.9,<2"]
 postgres = ["psycopg[binary]>=3.2,<4"]
 spark = ["pyspark>=3.5,<3.6"]
+cloud = ["boto3>=1.40,<2"]
 
 [project.scripts]
 belgiflow = "belgiflow.cli:main"

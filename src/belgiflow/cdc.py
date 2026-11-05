@@ -39,3 +39,33 @@ def consume(dsn, journal, consumer='belgiflow', limit=1000, fail_before_ack=Fals
 def changes(journal):
     with sqlite3.connect(journal) as con:
         return [json.loads(row[0]) for row in con.execute('SELECT payload FROM changes ORDER BY change_id')]
+
+
+def seed_demo(dsn):
+    import psycopg
+    from .pipeline import policies
+    initialize(dsn)
+    with psycopg.connect(dsn) as con:
+        for policy in policies():
+            prior=con.execute('SELECT revision FROM depot WHERE entity_id=%s',(policy['entity_id'],)).fetchone()
+            revision=1 if policy['effective_at'].startswith('2026-01-01') else 2
+            if prior and prior[0]>=revision:
+                continue
+            con.execute('''INSERT INTO depot(entity_id,capacity,effective_at,revision,radius_m)
+              VALUES (%s,%s,%s,%s,%s) ON CONFLICT(entity_id) DO UPDATE SET
+              capacity=excluded.capacity,effective_at=excluded.effective_at,
+              revision=excluded.revision,radius_m=excluded.radius_m''',
+                        (policy['entity_id'],policy['capacity'],policy['effective_at'],revision,policy['radius_m']))
+
+
+def effective_changes(journal):
+    from datetime import datetime,timezone
+    records=[]
+    for row in changes(journal):
+        payload=row['payload']
+        effective=row['observed_at'] if row['operation']=='DELETE' else payload['effective_at']
+        effective=datetime.fromisoformat(effective).astimezone(timezone.utc).isoformat()
+        records.append(dict(entity_id=row['entity_id'],effective_at=effective,revision=row['change_id'],
+                            capacity=payload['capacity'],radius_m=payload.get('radius_m',1000),
+                            deleted=row['operation']=='DELETE',observed_at=row['observed_at']))
+    return records

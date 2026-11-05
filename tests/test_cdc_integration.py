@@ -14,8 +14,8 @@ def test_commit_order_replay_and_deletes(tmp_path):
     first = psycopg.connect(DSN)
     second = psycopg.connect(DSN)
     try:
-        first.execute("INSERT INTO depot VALUES ('DEPOT-A',100,'2026-01-01',1)")
-        second.execute("INSERT INTO depot VALUES ('DEPOT-B',200,'2026-01-01',1)")
+        first.execute("INSERT INTO depot(entity_id,capacity,effective_at,revision) VALUES ('DEPOT-A',100,'2026-01-01',1)")
+        second.execute("INSERT INTO depot(entity_id,capacity,effective_at,revision) VALUES ('DEPOT-B',200,'2026-01-01',1)")
         second.commit()
         journal = tmp_path / 'cdc.sqlite'
         assert consume(DSN, journal) == 1

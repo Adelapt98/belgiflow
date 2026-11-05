@@ -25,7 +25,7 @@ def belgian_buildings(belgium_boundary):
 
 @asset
 def operational_marts():
-    return run(shipments=int(os.getenv('BELGIFLOW_SHIPMENTS','1000')))
+    return run(shipments=int(os.getenv('BELGIFLOW_SHIPMENTS','1000')),dsn=os.getenv('BELGIFLOW_DSN'))
 
 
 @asset
@@ -43,7 +43,7 @@ def dashboard(dbt_marts):
     from .storage import read_current,publish
     from .dashboard import render
     report=read_current('data/dashboard')
-    con=duckdb.connect(dbt_marts,read_only=True)
+    con=duckdb.connect(dbt_marts)
     try:
         cursor=con.execute('SELECT * FROM mart_depots ORDER BY depot_id')
         names=[c[0] for c in cursor.description]

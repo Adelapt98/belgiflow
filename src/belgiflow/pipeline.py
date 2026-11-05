@@ -23,7 +23,7 @@ def policies():
             for d in DEPOTS for day,capacity,radius in [(1,100,1000),(2,150,1800)]]
 
 
-def run(root='data', shipments=1000):
+def run(root='data', shipments=1000, dsn=None):
     root = Path(root)
     ledger = Ledger(root / 'ledger.sqlite')
     try:
@@ -34,7 +34,14 @@ def run(root='data', shipments=1000):
         silver = root / 'silver'
         silver.mkdir(parents=True,exist_ok=True)
         pq.write_table(pa.Table.from_pylist(events),silver/'events.parquet')
-        history = scd2(policies())
+        if dsn:
+            from .cdc import consume,effective_changes
+            journal=root/'cdc.sqlite'
+            while consume(dsn,journal):
+                pass
+            history=scd2(effective_changes(journal))
+        else:
+            history = scd2(policies())
         pq.write_table(pa.Table.from_pylist(history),silver/'depot_history.parquet')
         from .spatial import distance_meters
         coverage = []
@@ -52,7 +59,7 @@ def run(root='data', shipments=1000):
             depot=next(d for d in DEPOTS if d['entity_id']==event['depot_id'])
             distance=distance_meters((event['longitude'],event['latitude']),(depot['longitude'],depot['latitude']))
             coverage.append(dict(shipment_id=event['shipment_id'],depot_id=event['depot_id'],
-                                 distance_m=distance,covered=distance<=policy['radius_m'],
+                                 distance_m=distance,covered=not policy.get('deleted',False) and distance<=policy['radius_m'],
                                  policy_key=policy['surrogate_key']))
         pq.write_table(pa.Table.from_pylist(coverage),silver/'coverage.parquet')
         con=duckdb.connect(str(root/'warehouse.duckdb'))
