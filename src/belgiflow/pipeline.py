@@ -36,8 +36,10 @@ def run(root='data', shipments=1000, dsn=None):
         pq.write_table(pa.Table.from_pylist(events),silver/'events.parquet')
         if dsn:
             from .cdc import consume,effective_changes
+            from hashlib import sha256
             journal=root/'cdc.sqlite'
-            while consume(dsn,journal):
+            consumer='belgiflow-'+sha256(str(journal.resolve()).encode()).hexdigest()[:16]
+            while consume(dsn,journal,consumer=consumer):
                 pass
             history=scd2(effective_changes(journal))
         else:

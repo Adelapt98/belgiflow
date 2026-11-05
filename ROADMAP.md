@@ -1,18 +1,37 @@
 # Development roadmap
 
-## Implemented baseline
+## Working local release
 
-Synthetic event generation, correction-aware deduplication, SQL depot summaries, effective-time dimension rebuilding, polygon clipping, metric distances, immutable output publication, and offline CI configuration.
+- Real pinned Overture building, road-segment, connector, and national-boundary ingestion.
+- Exact polygon filtering and projected straight-line distance calculations.
+- Incremental synthetic event ledger, correction handling, replay, quarantine, and publication checksums.
+- Transactional PostgreSQL change capture with commit-order and interruption tests.
+- Effective-time depot history connected to service coverage.
+- Parquet and DuckDB outputs, dbt shipment models and reconciliation.
+- Dagster workflow and a dashboard published from tested dbt marts.
+- Executed Spark batch processing and pipeline-Parquet integration.
+- Docker packaging, locked dependencies, CI configuration, and locally validated Terraform.
 
-## Next integration milestones
+## Reliability and national coverage
 
-1. Replace broad remote scans with catalog-selected files, bounded timeouts, retry manifests, and restartable tile ingestion.
-2. Discover and verify the Belgian national polygon. Integrate exact clipping into source ingestion and validate transportation and building profiles.
-3. Build a PostgreSQL transactional outbox with durable consumption and commit-order integration tests. It is not implemented yet.
-4. Connect historical service policies and spatial coverage to shipment marts.
-5. Execute PySpark event processing and assess Sedona against measured workload needs.
-6. Add dbt models, Dagster assets and partitioned recovery, and the operational dashboard.
-7. Verify clean-checkout installation, national resource limits, and source licensing details.
-8. Prepare and validate an optional Terraform AWS deployment. Kubernetes remains deferred.
+Build a tile planner with resource estimates, per-partition retries, restartable scheduling, and nation-wide feature deduplication. Verify Belgian national workloads on measured disk and memory budgets. Add region-level marts and explicit treatment of cross-border road-network references.
 
-These are substantive planned integrations rather than claims of completed functionality. No production or national deployment is claimed.
+Extend source schema contracts and compatibility checks across retained releases. Add connector integrity checks and actual two-release map-change reports. The current snapshot comparison has synthetic fixture coverage.
+
+## Historical operations
+
+Add date-partitioned event ingestion and Dagster backfill jobs, configurable service commitments, and richer synthetic cancellation and correction scenarios. Add bitemporal reporting where business-effective time differs from observation time.
+
+Develop a reviewed quarantine resolution workflow and multi-consumer outbox retention policies. Add source-instance identity checks and disaster-recovery drills for journal loss and database restoration.
+
+## Distributed geospatial processing
+
+Measure the threshold where spatial SQL becomes a bottleneck. Evaluate Sedona for large spatial joins, compare outputs against the local reference, and only adopt it when results and operational costs justify the additional runtime.
+
+## Product and deployment
+
+Add regional filters, service-zone overlays, coverage exception inspection, and persistent run-health reporting to the dashboard. Keep synthetic and public geographic records visibly distinct.
+
+Execute an authorized AWS deployment, test actual ECR-to-Fargate execution and S3 publication, and verify teardown and costs. Add cloud recovery and access-control tests before calling it a supported deployment.
+
+These are genuine future engineering milestones. No users, production deployment, national-scale performance, or program acceptance is claimed.

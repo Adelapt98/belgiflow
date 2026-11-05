@@ -6,6 +6,7 @@ import requests
 import duckdb
 import hashlib
 import threading
+from datetime import datetime,timezone
 from concurrent.futures import ThreadPoolExecutor
 from urllib.parse import urljoin
 from requests.adapters import HTTPAdapter
@@ -155,7 +156,9 @@ def download(release, feature, bbox, output):
             timer.cancel()
         pending.replace(output)
         manifest = dict(release=release, feature=feature, bbox=list(bbox), rows=rows,
-                        bytes=output.stat().st_size,sha256=_checksum(output), exact_country_filter=False)
+                        bytes=output.stat().st_size,sha256=_checksum(output), exact_country_filter=False,
+                        extracted_at=datetime.now(timezone.utc).isoformat(),source_files=len(source),
+                        schema_fingerprint=hashlib.sha256(str(reader.schema).encode()).hexdigest())
         temporary_manifest=manifest_path.with_suffix('.tmp')
         temporary_manifest.write_text(json.dumps(manifest,indent=2),encoding='utf-8')
         temporary_manifest.replace(manifest_path)

@@ -6,6 +6,8 @@
 data
 dbt/target
 dbt/logs
+dbt/.user.yml
+**/*.egg-info
 **/__pycache__
 *.egg-info
 infra/.terraform
