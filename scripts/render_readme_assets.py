@@ -100,8 +100,8 @@ parts += [text(55,876,'Generated from belgiflow.platform.catalog. Local graph te
 # Product path and the supporting infrastructure are explicitly separated.
 parts=[rect(0,0,1500,1030,'#f5f7f3','#f5f7f3',0),
        '<defs><marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8" fill="#aab8ab"/></marker></defs>',
-       text(55,65,'From geographic data to a planning decision',31,weight=650),
-       text(55,98,'A practical application backed by reproducible data products.',15,'#778875'),
+       text(55,65,'BelgiFlow architecture',31,weight=650),
+       text(55,98,'Data acquisition, processing, storage and delivery.',15,'#778875'),
        rect(55,135,1390,230,'#eef4e9','#dae4d4'),text(78,167,'PLANNING PRODUCT',11,'#6d855d',600)]
 for x,title,lines in [(90,'Public map reference',['Overture snapshots','Buildings + roads + boundary']),
                       (430,'Coverage engine',['Configurable service hubs','Metric geometry + scenario comparison']),
@@ -109,19 +109,19 @@ for x,title,lines in [(90,'Public map reference',['Overture snapshots','Building
     width=300 if x==90 else 390 if x==430 else 510
     parts += [rect(x,190,width,130),text(x+20,224,title,19,weight=650),text(x+20,253,lines[0],12,'#7d8a76'),text(x+20,277,lines[1],12,'#7d8a76')]
 parts += [arrow(390,253,425,253),arrow(820,253,885,253),
-          rect(55,395,1390,230,'#ffffff','#dfe6de'),text(78,427,'LOCAL DATA PLATFORM / TESTED',11,'#6d855d',600),
+          rect(55,395,1390,230,'#ffffff','#dfe6de'),text(78,427,'DATA ENGINEERING',11,'#6d855d',600),
           logo('dagster.svg',110,470,175,48),text(108,552,'15 jobs · 21 connected assets',13,'#70846d'),
           logo('dbt.png',450,468,120,48),logo('spark.png',600,468,135,48),
           text(450,552,'SQL models + distributed batches',13,'#70846d'),
           text(925,490,'Parquet · DuckDB · PostgreSQL',22,weight=600),text(925,525,'History, quality and operational data products',13,'#70846d'),
           arrow(310,497,420,497),arrow(760,497,890,497),
-          rect(55,660,1390,270,'#f4f1f8','#e1d9e9'),text(78,692,'AWS TARGET ARCHITECTURE',11,'#8a739d',600)]
+          rect(55,660,1390,270,'#f4f1f8','#e1d9e9'),text(78,692,'AWS INFRASTRUCTURE',11,'#8a739d',600)]
 for x,file,title,note in [(110,'Amazon-Elastic-Container-Service.svg','ECS Fargate','On-demand task execution'),
                            (445,'Amazon-Simple-Storage-Service.svg','Amazon S3','Versioned product bundles'),
                            (780,'AWS-Glue.svg','AWS Glue','Spark + data catalog'),
                            (1115,'Amazon-Redshift.svg','Amazon Redshift','Serving tables + dbt')]:
     parts += [rect(x,720,275,165),logo(file,x+19,741,55,55),text(x+20,826,title,18,weight=600),text(x+20,852,note,12,'#83728e')]
-parts += [text(55,980,'Official tool marks identify the technologies used. No sponsorship or endorsement is implied.',11,'#84907d'),
-          text(55,1002,'Deployment design: ECS application services, S3 data lake, Glue processing and catalog, Redshift analytics. Infrastructure managed with Terraform.',11,'#84907d')]
+parts += [text(55,980,'',11,'#84907d'),
+          text(55,1002,'Infrastructure as code: Terraform   |   Application services: ECS   |   Data lake: S3   |   Processing: Glue   |   Analytics: Redshift',11,'#84907d')]
 (OUT/'architecture.svg').write_text(svg(1500,1030,parts),encoding='utf-8')
 print('Generated planning-report.svg, pipeline-map.svg, architecture.svg from source and actual results.')

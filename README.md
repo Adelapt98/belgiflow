@@ -4,7 +4,7 @@
 
 Compare service-hub locations, understand coverage trade-offs, and identify where a network needs attention. BelgiFlow combines an interactive geographic planner with date-based operational reports in a local workspace.
 
-![Coverage comparison on the Brussels street map](docs/assets/coverage-map.jpg)
+![Coverage comparison on the Brussels street map](docs/assets/coverage-map-hd.jpg)
 
 *Current coverage in blue, new coverage in green, and proposed overlap in amber. Captured from the running application using public Brussels map data and fictional hubs.*
 
@@ -25,7 +25,7 @@ In the public Brussels example, adding an eastern hub increases radius coverage 
 
 The operational view complements those comparisons with a built daily report:
 
-![Selected operational metrics and review actions](docs/assets/operations-summary.jpg)
+![Selected operational metrics and review actions](docs/assets/operations-summary-hd.jpg)
 
 *These are computed results from 300 synthetic shipments. The panel includes per-centre tables, coverage exceptions, report-date selection and dataset-quality evidence below this summary.*
 
@@ -86,7 +86,7 @@ AWS is the intended deployment platform. Local execution supports development an
 
 ### Architecture and tools
 
-![BelgiFlow architecture with official tool logos](docs/assets/architecture.png)
+![BelgiFlow architecture with official tool logos](docs/assets/architecture-v2.png)
 
 Python and SQL handle ingestion and analysis. Dagster orchestrates the workflows, dbt builds the analytical models, and PySpark handles the distributed processing path. Docker runs the local services. Terraform defines the AWS infrastructure shown above. S3 stores published data products, Glue provides managed Spark processing and catalog registration, Redshift serves analytical tables, ECS runs application services, and CloudWatch supports operational monitoring.
 

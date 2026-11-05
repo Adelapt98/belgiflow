@@ -26,3 +26,5 @@ Leaflet 1.9.4 is vendored from its published npm distribution and retains its BS
 Optional OpenStreetMap tiles retain their visible attribution. Public Overture inputs retain their upstream licenses and attribution obligations. See [source documentation](../SOURCES.md).
 
 `coverage-map.jpg` and `operations-summary.jpg` are focused browser captures of selected interface sections for the README. The map capture retains its attribution, legend and sample provenance. They do not depict the entire workspace.
+
+The README uses `coverage-map-hd.jpg` and `operations-summary-hd.jpg`, captured from the actual interface at 2x CSS render scale in a temporary documentation view. Higher-density street tiles are enabled for the map capture. Values, inputs and application logic are unchanged. `architecture-v2.png` is rendered at 3000 by 2060 pixels from the source SVG. Its neutral section labels describe architecture, while deployment validation remains documented in the README and verification record.
