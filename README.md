@@ -1,49 +1,39 @@
 # BelgiFlow
 
-**Compare where to expand your service network and see where existing operations need attention.**
+### Service-network planning and operational insight for Belgium
 
-BelgiFlow turns public map data into a local service-network planning workspace. Define current and proposed hubs, adjust their service radii, select a study area, and compare coverage gains, gaps, overlaps, and the sampled buildings reached by each option. Export the comparison as CSV or JSON with its inputs and geographic provenance.
+Compare service-hub locations, understand coverage trade-offs, and identify where a network needs attention. BelgiFlow combines an interactive geographic planner with date-based operational reports in a local workspace.
 
-![Actual BelgiFlow workspace with the Brussels street map, service hubs and coverage comparison](docs/assets/planner-overview.jpg)
+![Coverage comparison on the Brussels street map](docs/assets/coverage-map.jpg)
 
-The example above uses a real Belgian boundary and a small public Brussels map sample. Adding the fictional eastern hub increases radius coverage from **6.16 to 13.27 km²**, gaining **7.11 km²** and reaching **58 sampled building footprints**. These are computed results, not a production customer case.
+*Current coverage in blue, new coverage in green, and proposed overlap in amber. Captured from the running application using public Brussels map data and fictional hubs.*
 
-## What can you do with it?
+## What it helps you do
 
-| Decision | What the workspace shows | What you can take away |
-| --- | --- | --- |
-| Add, close or resize a service hub | Side-by-side area, overlap, gains, losses and sampled buildings | A reproducible comparison for shortlisting network options |
-| Review centre workload | Shipment volume, scenario capacity, utilization and excess allocation per centre | Which centres need an allocation or capacity review |
-| Investigate missed service areas | Out-of-radius totals and the furthest synthetic shipment exceptions | Concrete records to inspect instead of a headline number |
-| Review delivery performance | Delivered, on-time and cancelled shipments per centre | Where to investigate reliability, with an explicit denominator |
-| Check evidence before sharing | Report dates, map release, row counts and quality evidence | An export with traceable inputs and limitations |
+- **Compare expansion options.** Add, remove or resize hubs and measure newly covered areas, coverage lost elsewhere, overlap and sampled buildings reached.
+- **Review workload.** Find centres whose allocated shipment volume exceeds their configured capacity.
+- **Investigate service gaps and delays.** Inspect out-of-radius exceptions and compare delivered, on-time and cancelled shipments by centre.
+- **Share a traceable result.** Export planning comparisons as CSV or JSON, or download an operational report with its source and quality evidence.
 
-The daily operations panel reads actual built pipeline outputs. Its operational records are synthetic. It is a separate scenario from the interactive hub planner, and changing map hubs does not recalculate shipment performance. No revenue, demand or cost improvement is claimed.
+The planner supports preliminary network comparison. It evaluates the alternatives you define rather than automatically choosing an optimal site.
 
-![Actual operational results and review actions](docs/assets/operations-panel.jpg)
+## From a map to a decision
 
-## Use the planning workspace
+Choose a current network, edit the proposed alternative, and compare both within the same study area. Guided examples demonstrate adding a hub, closing a hub and extending a service radius.
 
-1. Enter your current hubs and their radius in kilometres.
-2. Edit the proposed network or add a hub by clicking the map.
-3. Choose a study area from the map and compare scenarios.
-4. Inspect newly covered areas, overlap, uncovered space, and sampled buildings.
-5. Download the report to review or reproduce the same analysis.
+In the public Brussels example, adding an eastern hub increases radius coverage from **6.16 to 13.27 km²**, with **7.11 km² gained**. Closing the western hub still gains coverage in the east but loses **5.22 km²** elsewhere. Showing both gains and losses makes that trade-off visible.
 
-Coverage uses metric straight-line radii, not road travel times. Sampled buildings are map footprints, not households, customers, or estimates of demand. A limited sample cannot establish complete building coverage across Belgium.
+The operational view complements those comparisons with a built daily report:
 
-<details>
-<summary>See the computed coverage summary and building sample</summary>
+![Selected operational metrics and review actions](docs/assets/operations-summary.jpg)
 
-![Computed coverage summary using the public Brussels sample](docs/assets/planning-report.png)
+*These are computed results from 300 synthetic shipments. The panel includes per-centre tables, coverage exceptions, report-date selection and dataset-quality evidence below this summary.*
 
-[Inspecting the building sample](docs/assets/planner-sample.jpg) shows a smaller user-selected study area, so its area totals differ from the default example.
+Operational reports are a separate scenario. Changing planner hubs does not recalculate shipment outcomes. Connecting those workflows is a priority in the [roadmap](ROADMAP.md).
 
-</details>
+## Quick start
 
-## Run locally
-
-Use Python 3.12. Install the locked runtime and the project:
+Requires **Python 3.12**. From the repository root, preferably in a virtual environment:
 
 ```bash
 pip install -r requirements.lock.txt
@@ -51,78 +41,72 @@ pip install -e . --no-deps
 python -m belgiflow.planner.demo
 ```
 
-Open [the planner](http://localhost:8080). The demo command first builds the operational report through Dagster and dbt, then starts the workspace with offline map fixtures. It needs no account or API key. It can take a minute to prepare. Use `--port 8081` if 8080 is already in use. To open only the planner without building operational results, run `python -m belgiflow.planner.server --source-mode fixtures`. To acquire real public geography and use the cached reference instead:
+Open **[localhost:8080](http://localhost:8080)**. The command builds the operational report through Dagster and dbt, then starts the complete offline demo. It uses explicitly synthetic geography and operations, requires no API keys, and can take a minute to prepare. Add `--port 8081` if needed.
+
+<details>
+<summary>Use real public map data</summary>
+
+Acquire the public reference, build its operational report, and start the planner against the cache:
 
 ```bash
-python -m belgiflow.platform.cli run --pipeline 01_geographic_reference --date 2026-01-03 --source-mode live --release 2026-10-21.0
+python -m belgiflow.platform.cli run --pipeline 01_geographic_reference --date 2026-01-03 --source-mode live
 python -m belgiflow.platform.cli run --pipeline 13_operations_dashboard --date 2026-01-03 --source-mode cached
 python -m belgiflow.planner.server --source-mode cached
 ```
 
-If the release is no longer retained, omit the release argument to discover one current release. See [sources and acquisition](docs/SOURCES.md) and [planner inputs and exports](docs/PLANNER.md).
+Live acquisition discovers a current Overture release and records its provenance. See the [source guide](docs/SOURCES.md) for release pinning, attribution and dataset scope. The README screenshots use release `2026-10-21.0`.
 
-With the public cache prepared, Docker Desktop can run both interfaces and the separate Spark worker:
+</details>
+
+<details>
+<summary>Run the planner, Dagster and Spark with Docker</summary>
+
+With Docker Desktop running and the public cache prepared:
 
 ```bash
 docker compose --profile ui up -d --build planner dagster spark-worker
 ```
 
-Open [planning on port 8080](http://localhost:8080) and [Dagster on port 3000](http://localhost:3000). On a fresh offline checkout, use the Python fixture command above or change the planner service source mode to `fixtures` before starting it. The local Compose services use root for Windows bind-mount compatibility. No Docker socket is mounted.
+The planner opens on [port 8080](http://localhost:8080) and Dagster on [port 3000](http://localhost:3000). The Compose planner uses cached geography. For a fresh offline checkout, use the Python demo above. See the [runbook](docs/RUNBOOK.md) for partitions, source modes and service management.
 
-## Data platform behind the product
+</details>
 
-The planning workspace is the main user interface. Fifteen independently launchable Dagster jobs support map acquisition, reproducible planning reports, data quality, and operational scenario analysis. Synthetic shipment workflows provide a separate way to exercise the platform without customer or driver records.
+## Behind the workspace
 
-![BelgiFlow product and optional cloud architecture](docs/assets/architecture.png)
+**15 Dagster jobs** prepare geographic references, ingest synthetic events, maintain depot-policy history, calculate analytical products, check quality and publish reproducible outputs.
 
-Local execution uses Python, SQL, Parquet, DuckDB, SQLite, dbt, Dagster, and a separate PySpark worker. PostgreSQL provides an optional transactional outbox. The optional AWS path includes S3, Glue, Redshift Serverless, ECS, CloudWatch, IAM, and Terraform. **AWS resources have not been deployed or verified live.**
+| Layer | Tools and responsibilities |
+| --- | --- |
+| Geographic analysis | Python, Shapely and PyProj for clipping, metric coverage and spatial joins |
+| Local data products | Parquet, SQLite, DuckDB and dbt for incremental ingestion and analytical models |
+| Orchestration and scale | Dagster, a separate PySpark worker and optional PostgreSQL outbox CDC |
+| Optional cloud path | Terraform, S3, Glue, Redshift Serverless, ECS and CloudWatch |
 
-![Fifteen jobs generated from the actual pipeline catalog](docs/assets/pipeline-map.png)
+The cloud path is implemented with offline contract checks. It has **not been deployed or validated live on AWS**.
 
-| Job | Main output | Engineering focus |
-| --- | --- | --- |
-| `01_geographic_reference` | Pinned geographic reference and clipped map features | Source provenance, release pinning, geometry validation |
-| `02_daily_shipment_ingestion` | Accepted daily shipment event cohort | Partitions, incremental ledger, deduplication, late revisions |
-| `03_depot_cdc_history` | Historical depot policies | Transactional outbox, replay, delete tombstones, SCD Type 2 |
-| `04_service_coverage` | Shipment-level coverage exceptions | Temporal policy joins, projected distances |
-| `05_delivery_sla` | Shipment facts and SLA marts | dbt affected-key incremental rebuilds and relational tests |
-| `06_depot_capacity` | Depot utilization and excess workload | Aggregation grain, historical capacity |
-| `07_building_accessibility` | Building distance to sampled roads | Spatial indexing and nearest geometry |
-| `08_map_change_audit` | Added, removed, changed feature IDs | Snapshot comparison, explicit change provenance |
-| `09_spark_compaction` | Distributed compacted event files | PySpark, partitioned Parquet, distributed reconciliation |
-| `10_quality_observability` | Quality and freshness reports | Contracts, checksums, cross-product reconciliation |
-| `11_lake_publication` | Immutable data-product bundle | S3 or local storage, manifests, completion pointers |
-| `12_warehouse_replication` | Serving warehouse and tested dbt models | Transactional staging and replacement, Redshift COPY |
-| `13_operations_dashboard` | Operational review dashboard | Quality-gated business metrics and provenance |
-| `14_catalog_registration` | Registered event schema and partition | Local schema registry or AWS Glue Data Catalog |
+[Architecture diagram](docs/assets/architecture.png) · [Pipeline catalog](docs/PIPELINES.md) · [AWS preparation](docs/AWS.md)
 
-| `15_network_planning` | Reproducible hub-network comparison and exports | Projected geometry, overlap, source fingerprints |
+## Scope and development status
 
-Jobs include upstream dependencies. Choose a date partition such as `2026-01-03` in Dagster. `15_network_planning` uses the same comparison engine as the app. `13_operations_dashboard` produces the supporting operational report. `full_platform_demo` runs the whole graph and requires the Spark worker.
+The local workspace, exports, dbt workflows, PostgreSQL CDC and Spark processing have been exercised locally. The current verification record contains **54 passing tests** and a clean offline-demo run.
 
-```bash
-python -m belgiflow.platform.cli list
-python -m belgiflow.platform.cli run --pipeline 15_network_planning --date 2026-01-03 --source-mode fixtures
-```
-
-Outputs are date-partitioned under `data/platform/partitions/`. The shared local warehouse deliberately serializes writers. See [pipeline contracts](docs/PIPELINES.md), [operations runbook](docs/RUNBOOK.md), and [optional AWS preparation](docs/AWS.md).
-
-## Status and continued development
-
-The local planner, operational results panel, scenario shortcuts, comparison exports, public-map sample, Dagster jobs, dbt transformations, PostgreSQL CDC, and separate Spark worker have been exercised locally. Cloud adapters have offline contract checks. National-scale acquisition, routing, real demand estimation, production deployment, and production users are not claimed.
-
-The [roadmap](ROADMAP.md) prioritizes fuller geographic coverage, better scenario decisions, reliability, and authorized cloud validation. The architecture can also be studied as a practical data engineering reference, but the product goal is useful geographic network comparison.
+Coverage is a **straight-line radius**, not road travel time. Public validation currently uses the Belgian boundary and a small Brussels building and road sample. Building footprints do not represent customers or demand. Operational records are synthetic. National completeness and production deployment remain future work.
 
 ```bash
 pip install pytest==9.2.0
 python -m pytest tests -q
-python scripts/verify_dagster.py
 ```
 
-The PostgreSQL integration test requires `BELGIFLOW_TEST_DSN` pointing to a separate disposable test database. It truncates project tables there. SDK-stub tests do not contact AWS. See the [verification record](docs/VERIFICATION.md). GitHub CI is configured but has not run remotely because the repository has not been published.
+The optional PostgreSQL integration test uses `BELGIFLOW_TEST_DSN` pointing to a disposable test database. See [verification details](docs/VERIFICATION.md) for checks and execution boundaries.
 
-## Ownership, data and assets
+Next priorities are connecting proposed networks to operational impact, expanding geographic coverage, and improving saved-scenario workflows. See the [development roadmap](ROADMAP.md).
 
-Created and personally maintained by Adel (Adelapt98). The product contains no AI functionality. Operational records are synthetic and public-map features are not customer records.
+## Documentation
 
-Original software is [MIT licensed](LICENSE). Public datasets retain their own licenses and attribution requirements. Third-party logos and Leaflet retain their respective rights and licenses, described in [asset credits](docs/assets/ASSETS.md). Tool logos identify integrations and do not imply endorsement. Downloaded datasets, credentials, private configuration, and generated runtime outputs are excluded from Git.
+[Planner guide](docs/PLANNER.md) · [Data sources](docs/SOURCES.md) · [Pipeline contracts](docs/PIPELINES.md) · [Runbook](docs/RUNBOOK.md) · [Roadmap](ROADMAP.md)
+
+## License and attribution
+
+Created and personally maintained by **Adel (Adelapt98)**. The product contains no AI functionality.
+
+Original software is [MIT licensed](LICENSE). Public datasets and third-party assets retain their own licenses and attribution requirements. See [asset credits](docs/assets/ASSETS.md).

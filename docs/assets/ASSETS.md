@@ -24,3 +24,5 @@ To refresh vendor assets, run `python scripts/fetch_visual_assets.py` first, the
 Leaflet 1.9.4 is vendored from its published npm distribution and retains its BSD 2-Clause license in `src/belgiflow/planner/web/vendor/LICENSE`.
 
 Optional OpenStreetMap tiles retain their visible attribution. Public Overture inputs retain their upstream licenses and attribution obligations. See [source documentation](../SOURCES.md).
+
+`coverage-map.jpg` and `operations-summary.jpg` are focused browser captures of selected interface sections for the README. The map capture retains its attribution, legend and sample provenance. They do not depict the entire workspace.
