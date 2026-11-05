@@ -2,6 +2,7 @@ services:
   dagster:
     build: .
     image: belgiflow:local
+    user: root
     profiles: [ui]
     command: [dagster, dev, -m, belgiflow.definitions, -h, 0.0.0.0, -p, "3000"]
     environment:
@@ -15,6 +16,7 @@ services:
       - ./src:/app/src:ro
       - ./warehouse_dbt:/app/warehouse_dbt:ro
       - ./jobs:/app/jobs:ro
+      - ./config/dagster.yaml:/app/data/dagster/dagster.yaml:ro
   spark-worker:
     image: apache/spark:3.5.3
     profiles: [ui]

@@ -1,4 +1,4 @@
-"""Thirteen partitioned data-product pipelines with an explicit dependency graph."""
+"""Fourteen partitioned data-product pipelines with an explicit dependency graph."""
 import os
 from dagster import asset, AssetSelection, ConfigurableResource, DailyPartitionsDefinition, Definitions, MetadataValue, define_asset_job
 from .platform.store import Store
@@ -20,7 +20,7 @@ class Platform(ConfigurableResource):
             raise ValueError('local scenario supports 1 to 10000 shipments per cohort')
         return Store(self.root,context.partition_key)
 
-COMMON=dict(partitions_def=PARTITIONS,op_tags={'dagster/concurrency_key':'belgiflow_writer'})
+COMMON=dict(partitions_def=PARTITIONS,pool='belgiflow_writer')
 
 @asset(group_name='geographic_reference',description='Pinned Belgian boundary with public or fixture provenance.',**COMMON)
 def geographic_reference(context,platform: Platform):

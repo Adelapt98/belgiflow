@@ -12,7 +12,7 @@ def main():
     parser.add_argument('--pipeline',default='13_operations_dashboard')
     parser.add_argument('--date',default='2026-01-03')
     parser.add_argument('--root',default='data/platform')
-    parser.add_argument('--source-mode',choices=['fixtures','cached','live'],default='fixtures')
+    parser.add_argument('--source-mode',choices=['fixtures','cached','live','s3'],default='fixtures')
     parser.add_argument('--shipments',type=int,default=300)
     args=parser.parse_args()
     from .catalog import PIPELINES

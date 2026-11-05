@@ -14,6 +14,7 @@ from .store import Store, day
 
 DEPOTS = [dict(entity_id=f'DEPOT-{i}', longitude=x, latitude=y)
           for i, (x, y) in enumerate([(4.35, 50.85), (4.36, 50.84), (4.37, 50.85)])]
+SCENARIO='belgium-cet-v1'
 
 
 def shipment_source(store, count=300):
@@ -22,10 +23,11 @@ def shipment_source(store, count=300):
     rows = generate(count, seed=int(store.partition.replace('-', '')))
     base = datetime(2026, 1, 1, tzinfo=timezone.utc)
     for row in rows:
-        row['event_id'] = store.partition + ':' + row['event_id']
-        row['shipment_id'] = 'SYN-' + store.partition + '-' + row['shipment_id'][4:]
+        row['event_id'] = SCENARIO + ':' + store.partition + ':' + row['event_id']
+        row['shipment_id'] = 'SYN-' + SCENARIO + '-' + store.partition + '-' + row['shipment_id'][4:]
         row['event_time'] = (start + (datetime.fromisoformat(row['event_time']) - base)).isoformat()
         row['source_date'] = store.partition
+        row['scenario'] = SCENARIO
         row['ingested_at'] = (start + timedelta(days=3)).isoformat()
     # Correct an originally delivered shipment to cancelled, without adding a new logical event.
     delivered = next(row for row in rows if row['status'] == 'delivered')
@@ -40,7 +42,7 @@ def accepted_events(store):
         rejected = ledger.db.execute('SELECT count(*) FROM quarantine WHERE batch=?', (batch,)).fetchone()[0]
         if rejected:
             raise ValueError('source partition has quarantined rows')
-        rows = [r for r in ledger.events() if r.get('source_date') == store.partition]
+        rows = [r for r in ledger.events() if r.get('source_date') == store.partition and r.get('scenario')==SCENARIO]
         return store.write('accepted_events', rows, dict(batch=batch, strategy='highest_revision_per_event'))
     finally:
         ledger.close()

@@ -2,6 +2,8 @@
 import pytest
 from botocore.stub import Stubber,ANY
 import boto3
+import io
+from pathlib import Path
 
 from belgiflow.platform.cloud import publish_lake,replicate,register_catalog
 from test_platform import product,clone
@@ -10,15 +12,21 @@ from test_platform import product,clone
 class S3Recorder:
     def __init__(self,fail=False):
         self.calls=[]
+        self.objects={}
         self.fail=fail
 
     def upload_file(self,path,bucket,key):
         if self.fail:
             raise RuntimeError('simulated upload failure')
         self.calls.append(('upload',key))
+        self.objects[key]=Path(path).read_bytes()
 
     def put_object(self,**request):
         self.calls.append(('put',request['Key']))
+        self.objects[request['Key']]=request['Body']
+
+    def get_object(self,**request):
+        return {'Body':io.BytesIO(self.objects[request['Key']])}
 
 
 def test_s3_failure_does_not_advance_success_pointer(clone):
@@ -55,3 +63,16 @@ def test_glue_catalog_registration_uses_exact_immutable_partition(clone):
         report=register_catalog(clone,'belgiflow','example-bucket',client)
         assert report['generation']==manifest['generation']
         stub.assert_no_pending_responses()
+
+
+def test_private_cloud_geography_bundle_preserves_source_provenance(clone,tmp_path,monkeypatch):
+    from belgiflow.platform.store import Store
+    from belgiflow.platform.geography import geographic_reference,map_features
+    client=S3Recorder()
+    manifest=publish_lake(clone,'example-bucket',s3=client)
+    monkeypatch.setenv('BELGIFLOW_MAP_BUNDLE',manifest['map_bundle_uri'])
+    monkeypatch.setattr(boto3,'client',lambda name:client)
+    remote=Store(tmp_path/'remote','2026-01-03')
+    reference=geographic_reference(remote,'s3')
+    assert reference['provenance']['mode']=='synthetic_geometry_fixture'
+    assert map_features(remote,'s3')['rows']==clone.read_json('map_features_manifest')['rows']

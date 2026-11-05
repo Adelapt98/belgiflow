@@ -1,5 +1,8 @@
 """Public-map reference products and explicit synthetic offline fixtures."""
 import json
+import os
+from hashlib import sha256
+from urllib.parse import urlparse
 from pathlib import Path
 from shapely import from_wkb, to_wkb, transform
 from shapely.geometry import Point, LineString, box, shape, mapping
@@ -11,9 +14,27 @@ from ..snapshots import compare
 
 
 def geographic_reference(store, mode='cached', legacy_root='data'):
-    if mode not in {'fixtures', 'cached', 'live'}:
+    if mode not in {'fixtures', 'cached', 'live', 's3'}:
         raise ValueError('unknown map source mode')
     legacy = Path(legacy_root)
+    if mode=='s3':
+        import boto3
+        uri=urlparse(os.environ['BELGIFLOW_MAP_BUNDLE'])
+        if uri.scheme!='s3' or not uri.netloc or not uri.path.startswith('/belgiflow/products/'):
+            raise ValueError('expected a pinned BelgiFlow map bundle URI')
+        client=boto3.client('s3')
+        bundle=json.loads(client.get_object(Bucket=uri.netloc,Key=uri.path.lstrip('/'))['Body'].read())
+        objects={}
+        for name in ['geographic_reference','map_features']:
+            item=bundle['objects'][name]
+            if not item['key'].startswith(uri.path.lstrip('/').rsplit('/',1)[0]+'/geography/'):
+                raise ValueError('geographic object escaped the pinned bundle')
+            payload=client.get_object(Bucket=uri.netloc,Key=item['key'])['Body'].read()
+            if sha256(payload).hexdigest()!=item['sha256']:
+                raise ValueError('geographic bundle checksum mismatch')
+            objects[name]=payload
+        store.path('s3_map_features').write_bytes(objects['map_features'])
+        return store.json('geographic_reference',json.loads(objects['geographic_reference']))
     if mode == 'live':
         from ..overture import discover, boundary, download
         release = discover()
@@ -33,7 +54,11 @@ def geographic_reference(store, mode='cached', legacy_root='data'):
 def map_features(store, mode='cached', legacy_root='data'):
     reference = store.read_json('geographic_reference')
     country = shape(reference['geometry'])
-    if mode == 'fixtures':
+    if mode=='s3':
+        features={kind:[] for kind in ['building','segment','connector']}
+        for row in pq.ParquetFile(store.path('s3_map_features')).read().to_pylist():
+            features[row['kind']].append((row['feature_id'],from_wkb(row['geometry'])))
+    elif mode == 'fixtures':
         features = {
             'building': [(f'fixture-building-{i}', box(4.345+i*.001, 50.845, 4.3455+i*.001, 50.8455)) for i in range(20)],
             'segment': [('fixture-road-1', LineString([(4.34,50.843),(4.38,50.843)])),

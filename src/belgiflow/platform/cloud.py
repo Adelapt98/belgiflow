@@ -52,7 +52,10 @@ def publish_lake(store, bucket=None, s3=None):
     if store.read_json('quality_report')['status'] != 'passed':
         raise ValueError('quality gate must pass before publishing')
     exports = export_tables(store)
-    generation = sha256(json.dumps({k:v['sha256'] for k,v in exports.items()},sort_keys=True).encode()).hexdigest()
+    identity=dict(tables={k:v['sha256'] for k,v in exports.items()},geography={
+        name:sha256(store.path(name,suffix).read_bytes()).hexdigest()
+        for name,suffix in [('geographic_reference','json'),('map_features','parquet')]})
+    generation = sha256(json.dumps(identity,sort_keys=True).encode()).hexdigest()
     prefix = f'belgiflow/products/date={store.partition}/generation={generation}'
     if bucket and not re.fullmatch(r'[a-z0-9][a-z0-9.-]{1,61}[a-z0-9]',bucket):
         raise ValueError('invalid bucket name')
@@ -78,6 +81,26 @@ def publish_lake(store, bucket=None, s3=None):
         else:
             (local_root/manifest_key).write_bytes(content)
         manifest['tables'][table]=dict(**item,key=key,manifest_key=manifest_key)
+    # Include a pinned geographic bundle so private cloud tasks need no public-map internet access.
+    geography={}
+    for name,suffix in [('geographic_reference','json'),('map_features','parquet')]:
+        path=store.path(name,suffix)
+        geo_key=f'{prefix}/geography/{name}.{suffix}'
+        payload=path.read_bytes()
+        if bucket:
+            s3.put_object(Bucket=bucket,Key=geo_key,Body=payload)
+        else:
+            destination=local_root/geo_key
+            destination.parent.mkdir(parents=True,exist_ok=True)
+            destination.write_bytes(payload)
+        geography[name]=dict(key=geo_key,sha256=sha256(payload).hexdigest())
+    bundle_key=f'{prefix}/map_bundle.json'
+    bundle_payload=json.dumps(dict(objects=geography),sort_keys=True).encode()
+    if bucket:
+        s3.put_object(Bucket=bucket,Key=bundle_key,Body=bundle_payload,ContentType='application/json')
+    else:
+        (local_root/bundle_key).write_bytes(bundle_payload)
+    manifest['map_bundle_uri']=f's3://{bucket}/{bundle_key}' if bucket else str(local_root/bundle_key)
     completion=json.dumps(manifest,sort_keys=True).encode()
     pointer=f'belgiflow/products/date={store.partition}/CURRENT.json'
     if bucket:

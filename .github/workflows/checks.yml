@@ -21,8 +21,11 @@ jobs:
       - run: pip install -r requirements.lock.txt && pip install -e '.[dev]' --no-deps && pip install pytest==9.2.0
       - run: python -m pytest tests -q
       - run: python scripts/verify_dagster.py
+      - run: dbt parse --project-dir warehouse_dbt --profiles-dir warehouse_dbt --target redshift --no-partial-parse
   spark:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: docker run --rm -v "$PWD/jobs:/jobs:ro" apache/spark:3.5.3 /opt/spark/bin/spark-submit /jobs/spark_events.py --shipments 10000
+      - run: pip install -r requirements.lock.txt && pip install -e . --no-deps
+      - run: python -m belgiflow.platform.cli run --pipeline 02_daily_shipment_ingestion --source-mode fixtures --shipments 100
+      - run: docker run --rm -v "$PWD/jobs:/jobs:ro" -v "$PWD/data:/data" apache/spark:3.5.3 /opt/spark/bin/spark-submit --master 'local[2]' /jobs/glue_compact.py --INPUT_PATH /data/platform/partitions/2026-01-03/accepted_events.parquet --OUTPUT_PATH /tmp/compacted --EXPECTED_SHIPMENTS 100

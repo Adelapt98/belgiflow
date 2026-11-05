@@ -76,6 +76,11 @@ variable "run_partition" {
   type    = string
   default = "2026-01-03"
 }
+variable "map_bundle_uri" {
+  type        = string
+  default     = ""
+  description = "Pinned S3 geographic bundle in the lake bucket. Empty selects clearly labeled synthetic map fixtures."
+}
 resource "aws_ecs_cluster" "batch" {
   name = "belgiflow"
 }
@@ -111,11 +116,12 @@ resource "aws_ecs_task_definition" "batch" {
   task_role_arn            = aws_iam_role.task.arn
   container_definitions = jsonencode([{
     name    = "batch", image = var.container_image, essential = true
-    command = ["python", "-m", "belgiflow.platform.cli", "run", "--pipeline", var.enable_analytics ? "full_platform_demo" : "13_operations_dashboard", "--date", var.run_partition, "--source-mode", "fixtures"]
+    command = ["python", "-m", "belgiflow.platform.cli", "run", "--pipeline", var.enable_analytics ? "full_platform_demo" : "13_operations_dashboard", "--date", var.run_partition, "--source-mode", var.map_bundle_uri != "" ? "s3" : "fixtures"]
     environment = concat([
       { name = "BELGIFLOW_BUCKET", value = aws_s3_bucket.lake.id },
       { name = "BELGIFLOW_BACKEND", value = var.enable_analytics ? "aws" : "local" },
       { name = "BELGIFLOW_SOURCE_MODE", value = "fixtures" },
+      { name = "BELGIFLOW_MAP_BUNDLE", value = var.map_bundle_uri },
       { name = "DBT_SEND_ANONYMOUS_USAGE_STATS", value = "false" }
       ], var.enable_analytics ? [
       { name = "BELGIFLOW_REDSHIFT_WORKGROUP", value = aws_redshiftserverless_workgroup.analytics[0].workgroup_name },
