@@ -9,7 +9,9 @@ import duckdb
 def build_marts(store, target='local'):
     executable = str(Path(sys.executable).with_name('dbt.exe' if os.name=='nt' else 'dbt'))
     environment = dict(os.environ, BELGIFLOW_WAREHOUSE=str((store.root/'warehouse.duckdb').resolve()),
-                       DBT_SEND_ANONYMOUS_USAGE_STATS='false')
+                       DBT_SEND_ANONYMOUS_USAGE_STATS='false',
+                       DBT_TARGET_PATH=str((store.directory/'dbt_target').resolve()),
+                       DBT_LOG_PATH=str((store.directory/'dbt_logs').resolve()))
     project = Path(os.environ.get('BELGIFLOW_DBT_PROJECT','warehouse_dbt')).resolve()
     result = subprocess.run([executable,'build','--project-dir',str(project),'--profiles-dir',str(project),'--target',target],
                             env=environment,capture_output=True,text=True,timeout=300)

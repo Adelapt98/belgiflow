@@ -13,6 +13,18 @@ services:
     volumes:
       - ./data:/app/data
       - ./src:/app/src:ro
+      - ./warehouse_dbt:/app/warehouse_dbt:ro
+      - ./jobs:/app/jobs:ro
+  spark-worker:
+    image: apache/spark:3.5.3
+    profiles: [ui]
+    user: root
+    entrypoint: [python3, /jobs/spark_worker.py]
+    environment:
+      BELGIFLOW_SPARK_QUEUE: platform/spark_queue
+    volumes:
+      - ./data:/data
+      - ./jobs:/jobs:ro
   postgres:
     image: postgres:17-alpine
     environment:
