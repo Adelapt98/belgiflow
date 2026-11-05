@@ -1,0 +1,13 @@
+.git
+.venv
+.python
+.uv-cache
+.tmp
+data
+dbt/target
+dbt/logs
+**/__pycache__
+*.egg-info
+infra/.terraform
+*.tfstate*
+.env
