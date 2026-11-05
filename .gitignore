@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.env
+data/
+*.duckdb
+*.duckdb.wal
+dbt/target/
+dbt/logs/
+.terraform/
+*.tfstate*
