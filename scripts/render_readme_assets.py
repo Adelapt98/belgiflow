@@ -115,13 +115,13 @@ parts += [arrow(390,253,425,253),arrow(820,253,885,253),
           text(450,552,'SQL models + distributed batches',13,'#70846d'),
           text(925,490,'Parquet · DuckDB · PostgreSQL',22,weight=600),text(925,525,'History, quality and operational data products',13,'#70846d'),
           arrow(310,497,420,497),arrow(760,497,890,497),
-          rect(55,660,1390,270,'#f4f1f8','#e1d9e9'),text(78,692,'OPTIONAL AWS IMPLEMENTATION / NOT DEPLOYED',11,'#8a739d',600)]
+          rect(55,660,1390,270,'#f4f1f8','#e1d9e9'),text(78,692,'AWS TARGET ARCHITECTURE',11,'#8a739d',600)]
 for x,file,title,note in [(110,'Amazon-Elastic-Container-Service.svg','ECS Fargate','On-demand task execution'),
                            (445,'Amazon-Simple-Storage-Service.svg','Amazon S3','Versioned product bundles'),
                            (780,'AWS-Glue.svg','AWS Glue','Spark + data catalog'),
                            (1115,'Amazon-Redshift.svg','Amazon Redshift','Serving tables + dbt')]:
     parts += [rect(x,720,275,165),logo(file,x+19,741,55,55),text(x+20,826,title,18,weight=600),text(x+20,852,note,12,'#83728e')]
 parts += [text(55,980,'Official tool marks identify the technologies used. No sponsorship or endorsement is implied.',11,'#84907d'),
-          text(55,1002,'Solid product path: local reference data and radius analysis. Cloud services are opt-in infrastructure defined in Terraform.',11,'#84907d')]
+          text(55,1002,'Deployment design: ECS application services, S3 data lake, Glue processing and catalog, Redshift analytics. Infrastructure managed with Terraform.',11,'#84907d')]
 (OUT/'architecture.svg').write_text(svg(1500,1030,parts),encoding='utf-8')
 print('Generated planning-report.svg, pipeline-map.svg, architecture.svg from source and actual results.')

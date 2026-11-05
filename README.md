@@ -80,15 +80,15 @@ The planner opens on [port 8080](http://localhost:8080) and Dagster on [port 300
 | Geographic analysis | Python, Shapely and PyProj for clipping, metric coverage and spatial joins |
 | Local data products | Parquet, SQLite, DuckDB and dbt for incremental ingestion and analytical models |
 | Orchestration and scale | Dagster, a separate PySpark worker and optional PostgreSQL outbox CDC |
-| Optional cloud path | Terraform, S3, Glue, Redshift Serverless, ECS and CloudWatch |
+| AWS deployment architecture | S3 data lake, Glue processing and catalog, Redshift Serverless analytics, ECS services, CloudWatch and Terraform |
 
-The cloud path is implemented with offline contract checks. It has **not been deployed or validated live on AWS**.
+AWS is the intended deployment platform. Local execution supports development and testing before cloud rollout.
 
 ### Architecture and tools
 
 ![BelgiFlow architecture with official tool logos](docs/assets/architecture.png)
 
-Python and SQL handle ingestion and analysis. Dagster orchestrates the workflows, dbt builds the analytical models, and PySpark handles the distributed processing path. Docker runs the local services. Terraform defines the optional AWS infrastructure shown above.
+Python and SQL handle ingestion and analysis. Dagster orchestrates the workflows, dbt builds the analytical models, and PySpark handles the distributed processing path. Docker runs the local services. Terraform defines the AWS infrastructure shown above. S3 stores published data products, Glue provides managed Spark processing and catalog registration, Redshift serves analytical tables, ECS runs application services, and CloudWatch supports operational monitoring.
 
 ### Pipelines
 
@@ -124,7 +124,7 @@ python -m belgiflow.platform.cli run --pipeline 15_network_planning --date 2026-
 
 ## Scope and development status
 
-The local workspace, exports, dbt workflows, PostgreSQL CDC and Spark processing have been exercised locally. The current verification record contains **54 passing tests** and a clean offline-demo run.
+The local workspace, exports, dbt workflows, PostgreSQL CDC and Spark processing have been exercised locally. The current verification record contains **54 passing tests** and a clean offline-demo run. AWS integrations have offline contract coverage. Deployment and live service validation are the next infrastructure milestone.
 
 Coverage is a **straight-line radius**, not road travel time. Public validation currently uses the Belgian boundary and a small Brussels building and road sample. Building footprints do not represent customers or demand. Operational records are synthetic. National completeness and production deployment remain future work.
 

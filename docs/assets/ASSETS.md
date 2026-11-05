@@ -2,7 +2,7 @@
 
 ## Original figures and screenshots
 
-`planning-report.svg` and its PNG are generated from the actual default comparison against the cached public Brussels sample. The hub choices are fictional. `pipeline-map.svg` is generated from the actual pipeline catalog. `architecture.svg` describes implemented local components and the optional, not-deployed AWS path. Original figure layout is covered by the repository MIT license, excluding third-party marks.
+`planning-report.svg` and its PNG are generated from the actual default comparison against the cached public Brussels sample. The hub choices are fictional. `pipeline-map.svg` is generated from the actual pipeline catalog. `architecture.svg` describes implemented local components and the target AWS deployment architecture. Original figure layout is covered by the repository MIT license, excluding third-party marks.
 
 `planner-overview.jpg`, `operations-panel.jpg` and `planner-sample.jpg` are actual local browser screenshots. The latter uses a smaller map-selected study area. Neither is a fabricated production customer case. Public geometry attribution appears in the interface and result figure.
 
